@@ -50,7 +50,7 @@ const Login = () => {
 
             if (result.data.status === 200) {
                 const checkUser = Base64.decode(result.data.data.access_token).includes("USER");
-                if (!checkUser) {
+                if (checkUser) {
                     hanleShowAlert({ open: true, message: `${error.response} :: Login not oke with USER !!!`, color: "danger" })
                     return
                 }

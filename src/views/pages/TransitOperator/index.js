@@ -5,6 +5,7 @@ import {
 } from "@coreui/react"
 import { useEffect, useState } from "react"
 import axios from "axios"
+import instanceAxios from "../../../configs/axiosConfig"
 import CIcon from "@coreui/icons-react"
 import * as icon from '@coreui/icons';
 
@@ -36,7 +37,7 @@ const TransitOperator = () => {
 
     const getTransitOperators = async () => {
         try {
-            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/transit_operator`)
+            const result = await instanceAxios.get(`${process.env.URL_BACKEND}/api/v1/location/transit_operator`)
             if (result.data.status === 200) {
                 const data = result.data.data
                 setTransitOperator(data)
@@ -44,7 +45,7 @@ const TransitOperator = () => {
                 setCurrentPage(1)
             }
         } catch (error) {
-            handleShowAlert({ open: true, message: `Error`, color: "danger" })
+            handleShowAlert({ open: true, message: `Error get `, color: "danger" })
         }
     }
 
@@ -68,7 +69,7 @@ const TransitOperator = () => {
         }
 
         try {
-            const result = await axios.post(`${process.env.URL_BACKEND}/api/v1/location/transit_operator`, JSON.stringify(values), {
+            const result = await instanceAxios.post(`${process.env.URL_BACKEND}/api/v1/location/transit_operator`, JSON.stringify(values), {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -79,6 +80,8 @@ const TransitOperator = () => {
                 getTransitOperators()
             }
         } catch (error) {
+            console.log("transit operator: ", error);
+            handleCloseModal()
             handleShowAlert({ open: true, message: "Error", color: "danger" })
         }
     }
