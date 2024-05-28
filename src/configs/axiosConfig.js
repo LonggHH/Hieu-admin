@@ -3,7 +3,7 @@ import axios from "axios";
 const instanceAxios = axios.create({
     // Các cài đặt mặc định của Axios ở đây
     baseURL: process.env.URL_BACKEND,
-    timeout: 10000, // Timeout của mỗi yêu cầu
+    timeout: 5000, // Timeout của mỗi yêu cầu
     headers: {
         'Content-Type': 'application/json'
     }

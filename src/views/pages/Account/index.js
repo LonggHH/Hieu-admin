@@ -81,13 +81,16 @@ const Account = () => {
 
     const getAccounts = async () => {
         try {
-            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/card`)
+            // const result = await instanceAxios.get(`/api/v1/card`)
+            const result = await instanceAxios.get(`${process.env.URL_BACKEND}/api/v1/card`)
+            console.log(result);
             const data = result.data
             setAccount(data)
             if (result.data.status === 200) {
 
             }
         } catch (error) {
+            console.log(error);
             handleShowAlert({ open: true, message: `Error acocunt`, color: "danger" })
         }
     }
@@ -105,7 +108,7 @@ const Account = () => {
                 setTransitOperator(result.data.data)
             }
         } catch (error) {
-            handleShowAlert({ open: true, message: `Error`, color: "danger" })
+            handleShowAlert({ open: true, message: `Error tran`, color: "danger" })
         }
     }
 

@@ -47,9 +47,10 @@ const Login = () => {
                     'Content-Type': 'application/json'
                 }
             })
-
+            console.log("Login >>> :: ", result);
             if (result.data.status === 200) {
-                const checkUser = Base64.decode(result.data.data.access_token).includes("USER");
+                // const checkUser = Base64.decode(result.data.data.access_token).includes("USER");
+                const checkUser = atob(result.data.data.access_token.split(".")[1]).includes("USER");
                 if (checkUser) {
                     hanleShowAlert({ open: true, message: `${error.response} :: Login not oke with USER !!!`, color: "danger" })
                     return

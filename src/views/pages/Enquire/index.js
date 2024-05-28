@@ -76,7 +76,7 @@ const Enquire = () => {
 
     const getEnquire = async () => {
         try {
-            const result = await axios.post(`${process.env.URL_BACKEND}/api/v1/validation/enquire`,
+            const result = await instanceAxios.post(`${process.env.URL_BACKEND}/api/v1/validation/enquire`,
                 JSON.stringify({
                     serialNumber: JSON.parse(localStorage.getItem('serial_number'))
                 }), {

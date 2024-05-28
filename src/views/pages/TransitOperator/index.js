@@ -37,7 +37,7 @@ const TransitOperator = () => {
 
     const getTransitOperators = async () => {
         try {
-            const result = await instanceAxios.get(`${process.env.URL_BACKEND}/api/v1/location/transit_operator`)
+            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/transit_operator`,)
             if (result.data.status === 200) {
                 const data = result.data.data
                 setTransitOperator(data)
@@ -68,12 +68,19 @@ const TransitOperator = () => {
             values[name] = value;
         }
 
+        console.log(values);
+
+        // const token = JSON.parse(localStorage.getItem('account_admin'));
         try {
-            const result = await instanceAxios.post(`${process.env.URL_BACKEND}/api/v1/location/transit_operator`, JSON.stringify(values), {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
+            const result = await instanceAxios.post(`/api/v1/location/transit_operator`, JSON.stringify(values))
+            // const token = JSON.parse(localStorage.getItem('account_admin'));
+            // const result = await axios.post(`http://192.168.0.102:8000/api/v1/location/transit_operator`, JSON.stringify(values), {
+            //     headers: {
+            //         "Content-Type": "application/json",
+            //         Authorization: `Bear`
+            //     }
+            // })
+            console.log(result);
             if (result.data.status === 201) {
                 handleCloseModal()
                 handleShowAlert({ open: true, message: "Success", color: "primary" })
@@ -81,8 +88,8 @@ const TransitOperator = () => {
             }
         } catch (error) {
             console.log("transit operator: ", error);
-            handleCloseModal()
-            handleShowAlert({ open: true, message: "Error", color: "danger" })
+            // handleCloseModal()
+            // handleShowAlert({ open: true, message: "Error post transit operator", color: "danger" })
         }
     }
 
@@ -100,7 +107,8 @@ const TransitOperator = () => {
             <CModal
                 scrollable
                 visible={formControl.open}
-                onClose={() => handleCloseModal}
+                onClose={handleCloseModal}
+                backdrop="static"
                 aria-labelledby="ScrollingLongContentExampleLabel2"
             >
                 <CModalHeader>
@@ -113,7 +121,7 @@ const TransitOperator = () => {
                                 defaultValue={formControl.data?.operatorName} />
                         </CCol>
                         <CCol xs={12}>
-                            <CButton color="primary" type="submit">Sign in</CButton>
+                            <CButton color="primary" type="submit">Submit</CButton>
                         </CCol>
                     </CForm>
                 </CModalBody>
