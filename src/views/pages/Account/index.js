@@ -168,7 +168,7 @@ const Account = () => {
             // console.log(result);
             if (result.data.status === 200) {
                 card.user = result.data.data
-                console.log(card);
+                // console.log(card);
                 setFclkUser({ open: true, title: "Link User", data: card })
             }
         } catch (error) {
@@ -230,6 +230,12 @@ const Account = () => {
             handleCloseModalLinkUser()
             handleShowAlert({ open: true, message: "Error", color: "danger" })
         }
+    }
+
+    const gotoCardHolder = () => {
+        // console.log(fclUser.data.serialNumber);
+        localStorage.setItem("serial_number", JSON.stringify(fclUser.data.serialNumber))
+        navigate("/report")
     }
 
     useEffect(() => {
@@ -295,16 +301,22 @@ const Account = () => {
                     <CForm className="row g-3">
 
                         {(fclUser.data?.user) &&
-                            <CButton color="primary"
-                                onClick={handleUnLinkUser}
-                            >Unlink</CButton>
-                        }
 
+                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <CButton color="primary"
+                                    onClick={gotoCardHolder}
+                                >Go to Card Holder</CButton>
+
+                                <CButton color="danger"
+                                    onClick={handleUnLinkUser}
+                                >Unlink</CButton>
+                            </div>
+                        }
 
                         <CFormInput
                             type="text"
                             id="userNameLink"
-                            label={`User name link: ${(fclUser?.data?.user?.firstname || "") + " " + (fclUser?.data?.user?.lastname || "")}`}
+                            label={`Card holder: ${(fclUser?.data?.user?.firstname || "") + " " + (fclUser?.data?.user?.lastname || "")}`}
                             placeholder=""
                             text="Enter name user want link."
                             aria-describedby="exampleFormControlInputHelpInline"

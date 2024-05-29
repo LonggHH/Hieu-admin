@@ -25,6 +25,8 @@ const Enquire = () => {
 
     const [enquire, setEnquire] = useState({});
     const [timeLine, setTimeLine] = useState([]);
+    const [cardHolder, setCardHolder] = useState({});
+    const [products, setProducts] = useState([])
 
     const [alert, setAlert] = useState(defaultAlert);
     const [toast, addToast] = useState(0);
@@ -109,6 +111,32 @@ const Enquire = () => {
         }
     }
 
+    const getProductUsedByCard = async () => {
+        try {
+            const result = await instanceAxios.get(`${process.env.URL_BACKEND}/api/v1/product/allProductUsedBy/${JSON.parse(localStorage.getItem('serial_number'))}`)
+            // console.log(result);
+            if (result.data.status === 200) {
+                setProducts(result.data.data)
+            }
+        } catch (error) {
+            console.log("error get enruire: ", error);
+            handleShowAlert({ open: true, message: `Error get product used by card`, color: "danger" })
+        }
+    }
+
+    const getCardHolder = async () => {
+        try {
+            const result = await instanceAxios.get(`${process.env.URL_BACKEND}/api/v1/card/findUsedBy/${JSON.parse(localStorage.getItem('serial_number'))}`)
+            // console.log(result);
+            if (result.data.status === 200) {
+                setCardHolder(result.data.data)
+            }
+        } catch (error) {
+            console.log("error get enruire: ", error);
+            handleShowAlert({ open: true, message: `Error get card holder`, color: "danger" })
+        }
+    }
+
     const handleNavigationPage = (status) => {
         switch (status) {
             case NAVIGATEPAGE.PREVIOUS:
@@ -151,12 +179,12 @@ const Enquire = () => {
             // console.log("Erorr Enquire Recharge ==>> :: ", error);
             handleShowAlert({ open: true, message: "Error Recharge", color: "danger" })
         }
-
-
     }
 
     useEffect(() => {
         getEnquire()
+        getCardHolder()
+        getProductUsedByCard()
     }, [])
 
     // console.log(enquire);
@@ -238,41 +266,38 @@ const Enquire = () => {
                     </div>
 
                     {
-                        enquire?.card?.user &&
+                        cardHolder?.id &&
                         <div>
-                            <h5 style={{ color: "grey" }}>User</h5>
+                            <h5 style={{ color: "grey" }}>Card holder</h5>
                             <CListGroup>
                                 <CListGroupItem as="button" active>
-                                    Name: {enquire?.card?.user?.firstname + " " + enquire?.card?.user?.lastname}
+                                    Name: {cardHolder?.firstname + " " + cardHolder.lastname}
                                 </CListGroupItem>
-                                <CListGroupItem as="button">Email: {enquire?.card?.user?.email}</CListGroupItem>
-                                <CListGroupItem as="button">Date of Birth :{enquire?.card?.user?.dob}</CListGroupItem>
+                                <CListGroupItem as="button">Email: {cardHolder?.email}</CListGroupItem>
+                                <CListGroupItem as="button">Date of Birth :{cardHolder?.dob}</CListGroupItem>
                                 <CListGroupItem as="button" disabled>
-                                    Status: <span>{enquire?.card?.user?.enabled ? "Active" : "Inactive"}</span>
-                                </CListGroupItem>
-                                <CListGroupItem as="button" disabled>
-                                    Role:
-                                    {enquire?.card?.user?.roles &&
-                                        <span>
-                                            {enquire?.card?.user?.roles.map((role, i) => (
-                                                <span key={i} style={{ margin: "0 6px" }}>{role}</span>
-                                            ))}
-                                        </span>
-                                    }
+                                    Status: <span>{cardHolder?.enabled ? "Active" : "Inactive"}</span>
                                 </CListGroupItem>
                             </CListGroup>
+                        </div>
+                    }
+
+                    {
+                        products.length > 0 &&
+                        <div>
                             <h5 style={{ color: "grey" }}>Products</h5>
-                            {enquire.products.map((product) => (
+                            {products.map((product) => (
                                 <CListGroup>
                                     <CListGroupItem as="button" active disabled>Name: {product.productName}</CListGroupItem>
-                                    {/* <CListGroupItem>Price: {product.price}</CListGroupItem> */}
                                     <CListGroupItem>Transit Operator: {product.transitOperator.operatorName}</CListGroupItem>
                                     <CListGroupItem>Transport Mode: {product.transportMode.modeName}</CListGroupItem>
+                                    <CListGroupItem>Expired At: {product.expiredAt.split("T")[1]} : {product.expiredAt.split("T")[0]}</CListGroupItem>
                                 </CListGroup>
                             ))}
                         </div>
                     }
                 </CCol>
+
                 <CCol sm={8}>
                     <h4 style={{ color: "grey" }}>Travel Validity</h4>
                     <div>

@@ -4,7 +4,7 @@ import {
     CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow,
 } from "@coreui/react";
 import { SmileOutlined } from '@ant-design/icons';
-import { Timeline } from 'antd';
+import { Popover, Steps, Timeline } from 'antd';
 import { useEffect, useState } from "react"
 import axios from "axios"
 import CIcon from "@coreui/icons-react"
@@ -14,14 +14,28 @@ const defaultAlert = { open: false, message: "", color: "primary" }
 const defaultForm = { open: false, title: 'Add', data: null }
 const NAVIGATEPAGE = { NEXT: 'NEXT', PREVIOUS: 'PREVIOUS' }
 
+const customDot = (dot, { status, index }) => (
+    <Popover
+        content={
+            // <span>
+            //     step {index} status: {status}
+            // </span>
+            ""
+        }
+    >
+        {dot}
+    </Popover>
+);
+
 const Route = () => {
 
     const lineIdChoose = JSON.parse(localStorage.getItem("line_id_choose"))
 
     const [alert, setAlert] = useState(defaultAlert)
-    const [viewMode, setViewMode] = useState(true);
+    const [viewMode, setViewMode] = useState(false);
 
     const [stop, setStop] = useState([])
+    const [stopIndex, setStopIndex] = useState([0, 0, 0])
     const [route, setRoute] = useState([])
     const [transitOperator, setTransitOperator] = useState([])
 
@@ -30,6 +44,15 @@ const Route = () => {
     const [pageSize, setPageSize] = useState(10)
 
     const [formControl, setFormControl] = useState(defaultForm)
+
+    const [current, setCurrent] = useState(0);
+    const onChange = (value) => {
+        const stopIndexClone = [...stopIndex];
+        const index = stopIndexClone[2];
+        stopIndexClone[index] = value;
+        setCurrent(value);
+        setStopIndex(stopIndexClone);
+    };
 
     const handleCloseModal = () => {
         setFormControl({ ...defaultForm })
@@ -124,32 +147,32 @@ const Route = () => {
         getTransitOperators()
     }, [])
 
-    const renderTImeLine = () => {
+    const renderStep = () => {
         if (stop.length === 0) {
             return []
         } else {
             let data = stop.map((el, i) => {
-                if (i === stop.length - 1) {
-                    return {
-                        color: '#00CCFF',
-                        dot: <SmileOutlined />,
-                        children: <p>{el.stopName}</p>,
-                    }
-                }
-                if (i === 0) {
-                    return {
-                        color: 'green',
-                        children: el.stopName,
-                    }
-                }
                 return {
-                    color: 'gray',
-                    children: el.stopName,
+                    title: el.stopName,
+                    description: "",
                 }
             })
             return data;
         }
     }
+
+    const changeIndexStopChoose = (index) => {
+        const stopIndexClone = [...stopIndex];
+        stopIndexClone[2] = index;
+        setStopIndex(stopIndexClone);
+    }
+
+    let viewStopIndex = stopIndex.filter((_, i) => i < 2).sort((a, b) => a - b)
+
+    const price = route.find(el =>
+        el.stopA.stopName == stop[viewStopIndex[0]].stopName &&
+        el.stopB.stopName == stop[viewStopIndex[1]].stopName
+    )
 
     return (
         <>
@@ -281,12 +304,30 @@ const Route = () => {
                     </div>
                 </>)
                 :
-                (<>
-                    <Timeline
-                        items={renderTImeLine()}
+                (<div style={{ marginBottom: 24 }}>
+                    <Steps
+                        style={{ display: 'flex', flexWrap: "wrap", width: "90%" }}
+                        current={current}
+                        onChange={onChange}
+                        progressDot={customDot}
+                        items={renderStep()}
                     />
-                </>)
+                </div>)
             }
+
+            <div style={{ marginBottom: 12 }}>
+                <span
+                    onClick={() => changeIndexStopChoose(0)}
+                    style={{ textDecoration: `${stopIndex[2] == 0 ? "underline" : ""}` }}
+                >{stop[viewStopIndex[0]]?.stopName}</span>
+                <sapn> - </sapn>
+                <span
+                    onClick={() => changeIndexStopChoose(1)}
+                    style={{ textDecoration: `${stopIndex[2] == 1 ? "underline" : ""}` }}
+                >{stop[viewStopIndex[1]]?.stopName}</span>
+                <span> : </span>
+                <span> ${price?.price || 0} </span>
+            </div>
         </>
     )
 }

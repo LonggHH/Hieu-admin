@@ -60,6 +60,8 @@ const Card = React.lazy(() => import('./views/pages/Account'))
 const Report = React.lazy(() => import('./views/pages/Enquire'))
 const User = React.lazy(() => import('./views/pages/User'))
 const Product = React.lazy(() => import('./views/pages/Product'))
+const ConfigGlobal = React.lazy(() => import('./views/pages/ConfigGlobal'))
+const AdminDashboard = React.lazy(() => import('./views/pages/Dashboard'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -117,6 +119,8 @@ const routes = [
   { path: '/report', name: 'Report', element: Report },
   { path: '/user', name: 'User', element: User },
   { path: '/product', name: 'Product', element: Product },
+  { path: '/configglobal', name: 'Config Global', element: ConfigGlobal },
+  { path: '/admindashboard', name: 'Admin Dashboard', element: AdminDashboard },
 ]
 
 export default routes
