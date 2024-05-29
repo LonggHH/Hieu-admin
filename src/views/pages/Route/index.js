@@ -1,8 +1,10 @@
 import {
     CAlert, CButton, CCol, CForm, CFormInput, CFormSelect, CModal, CModalBody,
     CModalHeader, CModalTitle, CPagination, CPaginationItem, CTable,
-    CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow
-} from "@coreui/react"
+    CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow,
+} from "@coreui/react";
+import { SmileOutlined } from '@ant-design/icons';
+import { Timeline } from 'antd';
 import { useEffect, useState } from "react"
 import axios from "axios"
 import CIcon from "@coreui/icons-react"
@@ -13,7 +15,11 @@ const defaultForm = { open: false, title: 'Add', data: null }
 const NAVIGATEPAGE = { NEXT: 'NEXT', PREVIOUS: 'PREVIOUS' }
 
 const Route = () => {
+
+    const lineIdChoose = JSON.parse(localStorage.getItem("line_id_choose"))
+
     const [alert, setAlert] = useState(defaultAlert)
+    const [viewMode, setViewMode] = useState(true);
 
     const [stop, setStop] = useState([])
     const [route, setRoute] = useState([])
@@ -40,7 +46,8 @@ const Route = () => {
         try {
             const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/stop`)
             if (result.data.status === 200) {
-                const data = result.data.data
+                let data = result.data.data
+                data = data.filter(el => el.line.id == lineIdChoose)
                 setStop(data)
                 setTotalPage(Math.ceil(data.length / pageSize))
                 setCurrentPage(1)
@@ -117,6 +124,33 @@ const Route = () => {
         getTransitOperators()
     }, [])
 
+    const renderTImeLine = () => {
+        if (stop.length === 0) {
+            return []
+        } else {
+            let data = stop.map((el, i) => {
+                if (i === stop.length - 1) {
+                    return {
+                        color: '#00CCFF',
+                        dot: <SmileOutlined />,
+                        children: <p>{el.stopName}</p>,
+                    }
+                }
+                if (i === 0) {
+                    return {
+                        color: 'green',
+                        children: el.stopName,
+                    }
+                }
+                return {
+                    color: 'gray',
+                    children: el.stopName,
+                }
+            })
+            return data;
+        }
+    }
+
     return (
         <>
 
@@ -178,61 +212,81 @@ const Route = () => {
                 <CButton color="primary" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Add</CButton>
             </div>
 
-            <CTable hover>
-                <CTableHead>
-                    <CTableRow>
-                        <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Id</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Stops</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Transit Operator</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Price</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Action</CTableHeaderCell>
-                    </CTableRow>
-                </CTableHead>
-                <CTableBody>
-                    {route
-                        .slice((currentPage - 1) * pageSize, currentPage * pageSize)
-                        .map((item, i) => (
-                            <CTableRow key={i}>
-                                <CTableHeaderCell scope="row">{i + 1}</CTableHeaderCell>
-                                <CTableDataCell>{item.id}</CTableDataCell>
+            <div style={{ marginBottom: 12, display: "flex", gap: 12 }}>
+                <span>View Mode: </span>
+                <CButton color="primary" onClick={() => setViewMode(true)}>Table</CButton>
+                <CButton color="primary" onClick={() => setViewMode(false)}>Time line</CButton>
+            </div>
 
-                                <CTableDataCell>
-                                    {item.stopA.stopName} - {item.stopB.stopName}
-                                </CTableDataCell>
-                                <CTableDataCell>
-                                    {item.transitOperator.operatorName}
-                                </CTableDataCell>
-                                <CTableDataCell>
-                                    {item.price}
-                                </CTableDataCell>
-                                <CTableDataCell>
+            {viewMode ?
+                (<>
+                    <CTable hover>
+                        <CTableHead>
+                            <CTableRow>
+                                <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                                {/* <CTableHeaderCell scope="col">Id</CTableHeaderCell> */}
+                                <CTableHeaderCell scope="col">Stops</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Line</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Transport mode</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Transit operator</CTableHeaderCell>
+                                {/* <CTableHeaderCell scope="col">Action</CTableHeaderCell> */}
+                            </CTableRow>
+                        </CTableHead>
+                        <CTableBody>
+                            {stop
+                                .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+                                .map((item, i) => (
+                                    <CTableRow key={i}>
+                                        <CTableHeaderCell scope="row">{i + 1}</CTableHeaderCell>
+                                        {/* <CTableDataCell>{item.id}</CTableDataCell> */}
+
+                                        <CTableDataCell>
+                                            {item.stopName}
+                                        </CTableDataCell>
+                                        <CTableDataCell>
+                                            {item.line.lineName}
+                                        </CTableDataCell>
+                                        <CTableDataCell>
+                                            {item.line.transportMode.modeName}
+                                        </CTableDataCell>
+                                        <CTableDataCell>
+                                            {item.line.transportMode.transitOperator.operatorName}
+                                        </CTableDataCell>
+                                        {/* <CTableDataCell>
                                     <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }} />
                                     <span style={{ margin: 10 }}></span>
                                     <CIcon icon={icon.cilXCircle} size='xl' style={{ cursor: "pointer", color: "#e55353" }} />
-                                </CTableDataCell>
-                            </CTableRow>
-                        ))}
-                </CTableBody>
-            </CTable>
+                                </CTableDataCell> */}
+                                    </CTableRow>
+                                ))}
+                        </CTableBody>
+                    </CTable>
 
-            <div style={{ float: "right" }}>
-                <CPagination aria-label="Page navigation example">
-                    <CPaginationItem aria-label="Previous" disabled={currentPage === 1}
-                        onClick={() => handleNavigationPage(NAVIGATEPAGE.PREVIOUS)}>
-                        <span aria-hidden="true">&laquo;</span>
-                    </CPaginationItem>
-                    {Array(totalPage).fill().map((_, i) => (
-                        <CPaginationItem key={i} active={currentPage === (i + 1) ? true : false}
-                            onClick={() => setCurrentPage(i + 1)}
-                        >{i + 1}</CPaginationItem>
-                    ))}
-                    <CPaginationItem aria-label="Next" disabled={currentPage === totalPage}
-                        onClick={() => handleNavigationPage(NAVIGATEPAGE.NEXT)}>
-                        <span aria-hidden="true">&raquo;</span>
-                    </CPaginationItem>
-                </CPagination>
-            </div>
+                    <div style={{ float: "right" }}>
+                        <CPagination aria-label="Page navigation example">
+                            <CPaginationItem aria-label="Previous" disabled={currentPage === 1}
+                                onClick={() => handleNavigationPage(NAVIGATEPAGE.PREVIOUS)}>
+                                <span aria-hidden="true">&laquo;</span>
+                            </CPaginationItem>
+                            {Array(totalPage).fill().map((_, i) => (
+                                <CPaginationItem key={i} active={currentPage === (i + 1) ? true : false}
+                                    onClick={() => setCurrentPage(i + 1)}
+                                >{i + 1}</CPaginationItem>
+                            ))}
+                            <CPaginationItem aria-label="Next" disabled={currentPage === totalPage}
+                                onClick={() => handleNavigationPage(NAVIGATEPAGE.NEXT)}>
+                                <span aria-hidden="true">&raquo;</span>
+                            </CPaginationItem>
+                        </CPagination>
+                    </div>
+                </>)
+                :
+                (<>
+                    <Timeline
+                        items={renderTImeLine()}
+                    />
+                </>)
+            }
         </>
     )
 }

@@ -95,6 +95,7 @@ const Stop = () => {
                 handleCloseModal()
                 handleShowAlert({ open: true, message: "Success", color: "primary" })
                 getLines()
+                getStops()
             }
         } catch (error) {
             handleShowAlert({ open: true, message: "Error", color: "danger" })
@@ -118,6 +119,7 @@ const Stop = () => {
                 visible={formControl.open}
                 onClose={() => handleCloseModal}
                 aria-labelledby="ScrollingLongContentExampleLabel2"
+                backdrop="static"
             >
                 <CModalHeader>
                     <CModalTitle id="ScrollingLongContentExampleLabel2">Stop</CModalTitle>
@@ -165,6 +167,7 @@ const Stop = () => {
                         <CTableHeaderCell scope="col">Id</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Name</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Line</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Transport mode</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Action</CTableHeaderCell>
                     </CTableRow>
                 </CTableHead>
@@ -177,7 +180,9 @@ const Stop = () => {
                                 <CTableDataCell>{item.id}</CTableDataCell>
                                 <CTableDataCell>{item.stopName}</CTableDataCell>
                                 <CTableDataCell>
-                                    <span> {item.line.lineName} </span> ::
+                                    <span> {item.line.lineName} </span>
+                                </CTableDataCell>
+                                <CTableDataCell>
                                     <span> {item.line.transportMode.modeName} </span>
                                 </CTableDataCell>
                                 <CTableDataCell>

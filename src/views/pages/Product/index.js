@@ -1,31 +1,25 @@
 import {
     CAlert, CButton, CCol, CForm, CFormInput, CFormSelect, CModal, CModalBody,
     CModalHeader, CModalTitle, CPagination, CPaginationItem, CTable,
-    CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow,
-    CTooltip
+    CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow
 } from "@coreui/react"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import CIcon from "@coreui/icons-react"
 import * as icon from '@coreui/icons';
-import { useNavigate } from "react-router-dom";
+import moment from "moment";
 
 const defaultAlert = { open: false, message: "", color: "primary" }
 const defaultForm = { open: false, title: 'Add', data: null }
 const NAVIGATEPAGE = { NEXT: 'NEXT', PREVIOUS: 'PREVIOUS' }
 
-const customTooltipStyle = {
-    '--cui-tooltip-bg': 'var(--cui-primary)',
-}
-
-const Line = () => {
-
-    const navigate = useNavigate()
+const Product = () => {
 
     const [alert, setAlert] = useState(defaultAlert)
 
+    const [products, setProducts] = useState([])
+    const [transitOperator, setTransitOperator] = useState([])
     const [transportMode, setTransportMode] = useState([])
-    const [line, setLine] = useState([])
 
     const [totalPage, setTotalPage] = useState(1)
     const [currentPage, setCurrentPage] = useState(1)
@@ -44,24 +38,40 @@ const Line = () => {
         }, 2000)
     }
 
-    const getTransportModes = async () => {
+    const getTransitOperators = async () => {
         try {
-            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/transport_mode`)
+            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/transit_operator`)
             if (result.data.status === 200) {
-                const data = result.data.data
-                setTransportMode(data)
+                setTransitOperator(result.data.data)
             }
         } catch (error) {
             handleShowAlert({ open: true, message: `Error`, color: "danger" })
         }
     }
 
-    const getLines = async () => {
+    const getTransportModes = async () => {
         try {
-            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/line`)
+            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/transport_mode`)
             if (result.data.status === 200) {
                 const data = result.data.data
-                setLine(data)
+                console.log(data);
+                setTransportMode(data)
+                // setTotalPage(Math.ceil(data.length / pageSize))
+                // setCurrentPage(1)
+            }
+        } catch (error) {
+            handleShowAlert({ open: true, message: `Error`, color: "danger" })
+        }
+    }
+
+    const getProducts = async () => {
+        try {
+            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/product`)
+            // console.log(result);
+            if (result.data.status === 200) {
+                const data = result.data.data
+                console.log(data);
+                setProducts(data)
                 setTotalPage(Math.ceil(data.length / pageSize))
                 setCurrentPage(1)
             }
@@ -90,34 +100,39 @@ const Line = () => {
         }
 
         const data = { ...values }
+        data.price = +data.price
+        data.validIn = moment().add(data.validIn, 'days').valueOf()
+        data.transitOperator = {
+            id: +values.transitOperator
+        }
         data.transportMode = {
-            id: values.transportMode
+            id: +values.transportMode
         }
 
+        // console.log(data);
+
         try {
-            const result = await axios.post(`${process.env.URL_BACKEND}/api/v1/location/line`, JSON.stringify(data), {
+            const result = await axios.post(`${process.env.URL_BACKEND}/api/v1/product`, JSON.stringify(data), {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             })
-            if (result.data.status === 201) {
+            console.log(result);
+            if (result.status === 202) {
                 handleCloseModal()
                 handleShowAlert({ open: true, message: "Success", color: "primary" })
-                getLines()
+                getProducts()
             }
         } catch (error) {
+            console.log("Eror create product ===>>> ::: ", error);
             handleShowAlert({ open: true, message: "Error", color: "danger" })
         }
     }
 
-    const linkToRoute = (id) => {
-        localStorage.setItem("line_id_choose", JSON.stringify(id))
-        navigate("/route")
-    }
-
     useEffect(() => {
+        getProducts()
+        getTransitOperators()
         getTransportModes()
-        getLines()
     }, [])
 
     return (
@@ -132,20 +147,41 @@ const Line = () => {
                 visible={formControl.open}
                 onClose={() => handleCloseModal}
                 aria-labelledby="ScrollingLongContentExampleLabel2"
+                backdrop="static"
             >
                 <CModalHeader>
-                    <CModalTitle id="ScrollingLongContentExampleLabel2">Line</CModalTitle>
+                    <CModalTitle id="ScrollingLongContentExampleLabel2">Product</CModalTitle>
                 </CModalHeader>
                 <CModalBody onSubmit={onSubmit}>
                     <CForm className="row g-3">
+
                         <CCol xs={12}>
-                            <CFormInput id="lineName" name="lineName" label="Name" placeholder="Bus"
-                                defaultValue={formControl.data?.lineName} />
+                            <CFormInput id="productName" name="productName" label="Name" placeholder=""
+                                defaultValue={formControl.data?.productName} />
+                        </CCol>
+
+                        <CCol xs={12}>
+                            <CFormInput id="price" name="price" label="Price" placeholder=""
+                                defaultValue={formControl.data?.price} />
+                        </CCol>
+
+                        <CCol xs={12}>
+                            <CFormInput id="validIn" name="validIn" label="Valid in" placeholder=""
+                                defaultValue={formControl.data?.validIn} />
                         </CCol>
 
                         <CFormSelect
                             aria-label="Default select example"
                             label='Transit Operator'
+                            name='transitOperator'
+                            options={transitOperator.map((item) => {
+                                return { label: item.operatorName, value: item.id }
+                            })}
+                        />
+
+                        <CFormSelect
+                            aria-label="Default select example"
+                            label='Transit Mode'
                             name='transportMode'
                             options={transportMode.map((item) => {
                                 return { label: item.modeName, value: item.id }
@@ -167,36 +203,28 @@ const Line = () => {
                 <CTableHead>
                     <CTableRow>
                         <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Id</CTableHeaderCell>
+                        {/* <CTableHeaderCell scope="col">Id</CTableHeaderCell> */}
                         <CTableHeaderCell scope="col">Name</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Transport Mode - Transit Operator</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Price</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Operator</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Mpde</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Action</CTableHeaderCell>
                     </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                    {line
+                    {products
                         .slice((currentPage - 1) * pageSize, currentPage * pageSize)
                         .map((item, i) => (
                             <CTableRow key={i}>
                                 <CTableHeaderCell scope="row">{i + 1}</CTableHeaderCell>
-                                <CTableDataCell>{item.id}</CTableDataCell>
-                                <CTableDataCell>{item.lineName}</CTableDataCell>
+                                {/* <CTableDataCell>{item.id}</CTableDataCell> */}
+                                <CTableDataCell>{item.productName}</CTableDataCell>
+                                <CTableDataCell>${item.price}</CTableDataCell>
+                                <CTableDataCell>{item.transitOperator.transitOperator}</CTableDataCell>
+                                <CTableDataCell>{item.transportMode.transportMode}</CTableDataCell>
                                 <CTableDataCell>
-                                    {item.transportMode.modeName} - {item.transportMode.transitOperator.operatorName}
-                                </CTableDataCell>
-                                <CTableDataCell style={{ display: "flex", gap: 12 }}>
-
-                                    <CTooltip
-                                        content="Link Route"
-                                        placement="top"
-                                        style={customTooltipStyle}
-                                    >
-                                        <CIcon icon={icon.cilLink} size="xl" style={{ cursor: "pointer", color: "#1b9e3e" }}
-                                            onClick={() => linkToRoute(item.id)} />
-                                    </CTooltip>
-
                                     <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }} />
-
+                                    <span style={{ margin: 10 }}></span>
                                     <CIcon icon={icon.cilXCircle} size='xl' style={{ cursor: "pointer", color: "#e55353" }} />
                                 </CTableDataCell>
                             </CTableRow>
@@ -225,4 +253,4 @@ const Line = () => {
     )
 }
 
-export default Line
+export default Product

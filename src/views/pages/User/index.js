@@ -246,7 +246,7 @@ const User = () => {
                                 <CTableDataCell>{item.dob}</CTableDataCell>
                                 <CTableDataCell>
                                     <span style={{ display: "flex", gap: 8 }}>
-                                        {item.roles.join(", ")}
+                                        {item.role}
                                     </span>
                                 </CTableDataCell>
                                 <CTableDataCell>{item.username}</CTableDataCell>

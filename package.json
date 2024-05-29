@@ -19,6 +19,7 @@
     "start": "vite"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.3.7",
     "@coreui/chartjs": "^4.0.0",
     "@coreui/coreui": "^5.0.0",
     "@coreui/icons": "^3.0.1",
@@ -27,6 +28,7 @@
     "@coreui/react-chartjs": "^3.0.0",
     "@coreui/utils": "^2.0.2",
     "@popperjs/core": "^2.11.8",
+    "antd": "^5.17.4",
     "axios": "^1.6.8",
     "chart.js": "^4.4.2",
     "classnames": "^2.5.1",

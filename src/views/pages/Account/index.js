@@ -83,7 +83,7 @@ const Account = () => {
         try {
             // const result = await instanceAxios.get(`/api/v1/card`)
             const result = await instanceAxios.get(`${process.env.URL_BACKEND}/api/v1/card`)
-            console.log(result);
+            // console.log(result);
             const data = result.data
             setAccount(data)
             if (result.data.status === 200) {
@@ -91,14 +91,15 @@ const Account = () => {
             }
         } catch (error) {
             console.log(error);
-            handleShowAlert({ open: true, message: `Error acocunt`, color: "danger" })
+            handleShowAlert({ open: true, message: `Error acocunt card loi`, color: "danger" })
         }
     }
 
     const handleClickEnquire = (data) => {
-        setFormControl({ open: true, title: "Update", data })
-        // localStorage.setItem('serial_number', JSON.stringify(serialNumber))
-        // navigate("/report")
+        // console.log(data);
+        // setFormControl({ open: true, title: "Update", data })
+        localStorage.setItem('serial_number', JSON.stringify(data.serialNumber))
+        navigate("/report")
     }
 
     const getTransitOperators = async () => {
@@ -117,11 +118,12 @@ const Account = () => {
             const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/users`)
             if (result.data.status === 200) {
                 const data = result.data.data
-                const newData = data.filter(item => item.roles.includes("USER"))
-                setUsers(newData)
+                // const newData = data.filter(item => item.roles.includes("USER"))
+                setUsers(data)
             }
         } catch (error) {
-            handleShowAlert({ open: true, message: `Error get user`, color: "danger" })
+            // console.log("loi get all user: ", error);
+            handleShowAlert({ open: true, message: `Error get user loi`, color: "danger" })
         }
     }
 
@@ -166,6 +168,7 @@ const Account = () => {
             // console.log(result);
             if (result.data.status === 200) {
                 card.user = result.data.data
+                console.log(card);
                 setFclkUser({ open: true, title: "Link User", data: card })
             }
         } catch (error) {
@@ -236,6 +239,7 @@ const Account = () => {
     }, [])
 
     // console.log(fclUser?.data?.user);
+    // console.log(account);
 
     return (
         <>
@@ -384,8 +388,10 @@ const Account = () => {
                                             <CIcon icon={icon.cilLink} size="xl" style={{ cursor: "pointer", color: "#1b9e3e" }}
                                                 onClick={() => handleOpenFCLUser(item)} />
                                         </CTooltip>
+
                                         <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e", }}
                                             onClick={() => handleClickEnquire(item)} />
+
                                         <CIcon icon={icon.cilXCircle} size='xl' style={{ cursor: "pointer", color: "#e55353" }} />
                                     </CTableDataCell>
                                 </CTableRow>

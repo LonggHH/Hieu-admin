@@ -2,7 +2,9 @@ import { cilArrowTop } from "@coreui/icons"
 import CIcon from "@coreui/icons-react"
 import {
     CAlert, CButton, CCol, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle,
-    CListGroup, CListGroupItem, CPagination, CPaginationItem, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CToast, CToastBody, CToastHeader, CToaster, CWidgetStatsA
+    CForm,
+    CFormInput,
+    CListGroup, CListGroupItem, CModal, CModalBody, CModalHeader, CModalTitle, CPagination, CPaginationItem, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CToast, CToastBody, CToastHeader, CToaster, CTooltip, CWidgetStatsA
 } from "@coreui/react"
 import { CChartLine } from "@coreui/react-chartjs"
 import axios from "axios"
@@ -14,6 +16,10 @@ import instanceAxios from "../../../configs/axiosConfig";
 const defaultAlert = { open: false, message: "", color: "primary" }
 const defaultForm = { open: false, title: 'Add', data: null }
 const NAVIGATEPAGE = { NEXT: 'NEXT', PREVIOUS: 'PREVIOUS' }
+
+const customTooltipStyle = {
+    '--cui-tooltip-bg': 'var(--cui-primary)',
+}
 
 const Enquire = () => {
 
@@ -27,6 +33,8 @@ const Enquire = () => {
     const [totalPage, setTotalPage] = useState(1)
     const [currentPage, setCurrentPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
+
+    const [formControl, setFormControl] = useState(defaultForm)
 
     const handleShowAlert = (alert) => {
         setAlert(alert)
@@ -85,17 +93,18 @@ const Enquire = () => {
                 }
             })
             if (result.data.status === 200) {
-                // console.log(result.data.data);
+                // console.log(result.data);
 
                 const { inspections, validations } = result.data.data;
                 const cartTime = [].concat(inspections, validations);
                 cartTime.sort((a, b) => b.transactionTime - a.transactionTime);
-                console.log(cartTime);
+                // console.log(cartTime);
                 setEnquire(result.data.data);
                 setTimeLine(cartTime);
                 setTotalPage(Math.ceil(cartTime.length / pageSize));
             }
         } catch (error) {
+            console.log("error get enruire: ", error);
             handleShowAlert({ open: true, message: `Error enquire`, color: "danger" })
         }
     }
@@ -111,9 +120,46 @@ const Enquire = () => {
         }
     }
 
+    const handleCloseModal = () => {
+        setFormControl(defaultForm)
+    }
+
+    const handleOpenModalRecharge = () => {
+        setFormControl(pre => ({ ...pre, open: true }))
+    }
+
+    const submitModalRecharge = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const values = {};
+        for (let [name, value] of formData.entries()) {
+            values[name] = value;
+        }
+
+        values.serialNumber = enquire.card.serialNumber;
+        values.description = "Recharge from sale";
+        values.transactionDate = moment().utc().add(7, 'hours').format('YYYY-MM-DDTHH:mm:ss[Z]');
+
+        try {
+            const result = await instanceAxios.post(`${process.env.URL_BACKEND}/api/v1/users/recharge`, JSON.stringify(values))
+            // console.log(result);
+            if (result.status === 200) {
+                handleCloseModal()
+                getEnquire()
+            }
+        } catch (error) {
+            // console.log("Erorr Enquire Recharge ==>> :: ", error);
+            handleShowAlert({ open: true, message: "Error Recharge", color: "danger" })
+        }
+
+
+    }
+
     useEffect(() => {
         getEnquire()
     }, [])
+
+    // console.log(enquire);
 
     return (
         <>
@@ -122,6 +168,42 @@ const Enquire = () => {
             <CAlert color={alert.color} dismissible visible={alert.open} onClose={() => setAlert(defaultAlert)}>
                 {alert.message}
             </CAlert>
+
+            <CModal
+                scrollable
+                visible={formControl.open}
+                onClose={handleCloseModal}
+                aria-labelledby="ScrollingLongContentExampleLabel2"
+                backdrop="static"
+            >
+                <CModalHeader>
+                    <CModalTitle id="ScrollingLongContentExampleLabel2">Recharge</CModalTitle>
+                </CModalHeader>
+                <CModalBody onSubmit={submitModalRecharge}>
+                    <CForm className="row g-3">
+                        {/* <CCol xs={12}>
+                            <CFormInput id="modeName" name="modeName" label="Name" placeholder="Bus"
+                                defaultValue={formControl.data?.modeName} />
+                        </CCol> */}
+
+                        <CFormInput
+                            type="text"
+                            id="amount"
+                            name="amount"
+                            label={`Input money`}
+                            placeholder="$1000"
+                            text=""
+                            aria-describedby="exampleFormControlInputHelpInline"
+                        // onChange={(e) => setTextSearchUser(e.target.value)}
+                        />
+
+
+                        <CCol xs={12}>
+                            <CButton color="primary" type="submit">Recharge</CButton>
+                        </CCol>
+                    </CForm>
+                </CModalBody>
+            </CModal>
 
             <CRow>
                 <CCol sm={4}>
@@ -147,6 +229,10 @@ const Enquire = () => {
                             </CListGroupItem>
                             <CListGroupItem as="button" disabled>
                                 Transit Operator: <span>{enquire?.card?.transitOperator?.operatorName}</span>
+                            </CListGroupItem>
+                            <CListGroupItem as="button" style={{ display: "flex", justifyContent: 'space-between' }}>
+                                <span>Balance: <span>${enquire?.card?.balance}</span></span>
+                                <CButton color={"primary"} onClick={() => handleOpenModalRecharge()}>Recharge</CButton>
                             </CListGroupItem>
                         </CListGroup>
                     </div>
@@ -244,7 +330,7 @@ const Enquire = () => {
                         </div>
                     </div>
                 </CCol>
-            </CRow>
+            </CRow >
         </>
     )
 }

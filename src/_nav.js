@@ -365,6 +365,12 @@ const _nav = [
         to: '/user',
         icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
     },
+    {
+        component: CNavItem,
+        name: 'Product',
+        to: '/product',
+        icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
+    },
 ]
 
 export default _nav
