@@ -19,6 +19,7 @@ import { cilLockLocked, cilUser } from '@coreui/icons'
 import axios from 'axios'
 import { Base64 } from 'js-base64';
 
+
 const defaultAlert = { open: false, message: "", color: "primary" }
 
 const Login = () => {
@@ -57,7 +58,7 @@ const Login = () => {
                 }
                 localStorage.setItem('account_admin', JSON.stringify(result.data.data))
                 hanleShowAlert({ open: true, message: "Login oke", color: "primary" })
-                navigate("/dashboard");
+                navigate("/configglobal");
             }
         } catch (error) {
             console.log(error);
@@ -115,11 +116,16 @@ const Login = () => {
                                         </CForm>
                                     </CCardBody>
                                 </CCard>
-                                <CCard className="text-white bg-primary py-5" style={{ width: '44%' }}>
+                                <CCard className="text-white bg-primary py-5 chen-oto"
+                                    style={{
+                                        width: '44%',
+
+                                    }}
+                                >
                                     <CCardBody className="text-center">
-                                        <div>
-                                            <h2>Sign up</h2>
-                                            <p>
+                                        {/* <div>
+                                            <h2 style={{ opacity: 0 }}>Sign up</h2>
+                                            <p style={{ opacity: 0 }}>
                                                 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
                                                 tempor incididunt ut labore et dolore magna aliqua.
                                             </p>
@@ -128,7 +134,7 @@ const Login = () => {
                                                     Register Now!
                                                 </CButton>
                                             </Link>
-                                        </div>
+                                        </div> */}
                                     </CCardBody>
                                 </CCard>
                             </CCardGroup>

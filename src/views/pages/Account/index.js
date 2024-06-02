@@ -81,10 +81,9 @@ const Account = () => {
 
     const getAccounts = async () => {
         try {
-            // const result = await instanceAxios.get(`/api/v1/card`)
             const result = await instanceAxios.get(`${process.env.URL_BACKEND}/api/v1/card`)
-            // console.log(result);
             const data = result.data
+            localStorage.setItem("cartLength", JSON.stringify(data.length))
             setAccount(data)
             if (result.data.status === 200) {
 
@@ -96,8 +95,6 @@ const Account = () => {
     }
 
     const handleClickEnquire = (data) => {
-        // console.log(data);
-        // setFormControl({ open: true, title: "Update", data })
         localStorage.setItem('serial_number', JSON.stringify(data.serialNumber))
         navigate("/report")
     }

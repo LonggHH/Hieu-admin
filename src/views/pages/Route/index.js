@@ -32,7 +32,7 @@ const Route = () => {
     const lineIdChoose = JSON.parse(localStorage.getItem("line_id_choose"))
 
     const [alert, setAlert] = useState(defaultAlert)
-    const [viewMode, setViewMode] = useState(false);
+    const [viewMode, setViewMode] = useState(true);
 
     const [stop, setStop] = useState([])
     const [stopIndex, setStopIndex] = useState([0, 0, 0])
@@ -174,6 +174,8 @@ const Route = () => {
         el.stopB.stopName == stop[viewStopIndex[1]].stopName
     )
 
+    console.log(route);
+
     return (
         <>
 
@@ -248,15 +250,15 @@ const Route = () => {
                             <CTableRow>
                                 <CTableHeaderCell scope="col">#</CTableHeaderCell>
                                 {/* <CTableHeaderCell scope="col">Id</CTableHeaderCell> */}
-                                <CTableHeaderCell scope="col">Stops</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Line</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Transport mode</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Transit operator</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Transit Operator</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Stop A</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Stop B</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Price</CTableHeaderCell>
                                 {/* <CTableHeaderCell scope="col">Action</CTableHeaderCell> */}
                             </CTableRow>
                         </CTableHead>
                         <CTableBody>
-                            {stop
+                            {route
                                 .slice((currentPage - 1) * pageSize, currentPage * pageSize)
                                 .map((item, i) => (
                                     <CTableRow key={i}>
@@ -264,16 +266,16 @@ const Route = () => {
                                         {/* <CTableDataCell>{item.id}</CTableDataCell> */}
 
                                         <CTableDataCell>
-                                            {item.stopName}
+                                            {item.transitOperator.operatorName}
                                         </CTableDataCell>
                                         <CTableDataCell>
-                                            {item.line.lineName}
+                                            {item.stopA.stopName}
                                         </CTableDataCell>
                                         <CTableDataCell>
-                                            {item.line.transportMode.modeName}
+                                            {item.stopB.stopName}
                                         </CTableDataCell>
                                         <CTableDataCell>
-                                            {item.line.transportMode.transitOperator.operatorName}
+                                            ${item.price}
                                         </CTableDataCell>
                                         {/* <CTableDataCell>
                                     <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }} />
@@ -312,22 +314,24 @@ const Route = () => {
                         progressDot={customDot}
                         items={renderStep()}
                     />
+
+                    <div style={{ marginBottom: 12 }}>
+                        <span
+                            onClick={() => changeIndexStopChoose(0)}
+                            style={{ textDecoration: `${stopIndex[2] == 0 ? "underline" : ""}` }}
+                        >{stop[viewStopIndex[0]]?.stopName}</span>
+                        <sapn> - </sapn>
+                        <span
+                            onClick={() => changeIndexStopChoose(1)}
+                            style={{ textDecoration: `${stopIndex[2] == 1 ? "underline" : ""}` }}
+                        >{stop[viewStopIndex[1]]?.stopName}</span>
+                        <span> : </span>
+                        <span> ${price?.price || 0} </span>
+                    </div>
                 </div>)
             }
 
-            <div style={{ marginBottom: 12 }}>
-                <span
-                    onClick={() => changeIndexStopChoose(0)}
-                    style={{ textDecoration: `${stopIndex[2] == 0 ? "underline" : ""}` }}
-                >{stop[viewStopIndex[0]]?.stopName}</span>
-                <sapn> - </sapn>
-                <span
-                    onClick={() => changeIndexStopChoose(1)}
-                    style={{ textDecoration: `${stopIndex[2] == 1 ? "underline" : ""}` }}
-                >{stop[viewStopIndex[1]]?.stopName}</span>
-                <span> : </span>
-                <span> ${price?.price || 0} </span>
-            </div>
+
         </>
     )
 }

@@ -85,6 +85,7 @@ const User = () => {
             const result = await instanceAxios.get(`/api/v1/users`)
             if (result.data.status === 200) {
                 const data = result.data.data
+                localStorage.setItem("userLength", JSON.stringify(data.length))
                 // console.log("==>> :: ", data);
                 setUsers(data)
                 setTotalPage(Math.ceil(data.length / pageSize))

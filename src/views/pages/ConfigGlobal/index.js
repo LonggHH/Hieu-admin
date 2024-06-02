@@ -146,23 +146,25 @@ const ConfigGlobal = () => {
                 </CModalBody>
             </CModal>
 
-            <div style={{ marginBottom: 12 }}>
-                <CButton color="primary" onClick={() => setFormControl({ open: true, title: 'Update', data: configGlobal })}>Update</CButton>
+            <div style={{ marginBottom: 12, display: 'flex', justifyContent: "center" }}>
+                <CCard style={{ width: '24rem' }}>
+                    <CCardHeader>Config Global</CCardHeader>
+                    <CListGroup flush>
+                        <CListGroupItem>Balance Warning Target: ${configGlobal?.balanceWarningTarget}</CListGroupItem>
+                        <CListGroupItem>Max Remaining Ticket: {millisecondsToMinutes(configGlobal?.maxRemainingTicket)} minute</CListGroupItem>
+                        <CListGroupItem>Accepted List Target Balance: ${configGlobal?.acceptedListTargetBalance}</CListGroupItem>
+                        <CListGroupItem>Anti Pass Back Time: {millisecondsToMinutes(configGlobal?.antiPassBackTime)} minute</CListGroupItem>
+                        {configGlobal?.samePrice && <CListGroupItem>Same Price Value: ${configGlobal?.samePriceValue}</CListGroupItem>}
+                        <CListGroupItem style={{ display: "flex", justifyContent: "space-between" }}>
+                            Same Price: {configGlobal?.samePrice ? "on" : "off"}
+                        </CListGroupItem>
+                    </CListGroup>
+                </CCard>
             </div>
 
-            <CCard style={{ width: '18rem' }}>
-                <CCardHeader>Config Global</CCardHeader>
-                <CListGroup flush>
-                    <CListGroupItem>Balance Warning Target: ${configGlobal?.balanceWarningTarget}</CListGroupItem>
-                    <CListGroupItem>Max Remaining Ticket: {millisecondsToMinutes(configGlobal?.maxRemainingTicket)} minute</CListGroupItem>
-                    <CListGroupItem>Accepted List Target Balance: ${configGlobal?.acceptedListTargetBalance}</CListGroupItem>
-                    <CListGroupItem>Anti Pass Back Time: {millisecondsToMinutes(configGlobal?.antiPassBackTime)} minute</CListGroupItem>
-                    {configGlobal?.samePrice && <CListGroupItem>Same Price Value: ${configGlobal?.samePriceValue}</CListGroupItem>}
-                    <CListGroupItem style={{ display: "flex", justifyContent: "space-between" }}>
-                        Same Price: {configGlobal?.samePrice ? "on" : "off"}
-                    </CListGroupItem>
-                </CListGroup>
-            </CCard>
+            <div style={{ marginBottom: 12, display: 'flex', justifyContent: "center" }}>
+                <CButton color="primary" onClick={() => setFormControl({ open: true, title: 'Update', data: configGlobal })}>Edit</CButton>
+            </div>
         </>
     )
 }

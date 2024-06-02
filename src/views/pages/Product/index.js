@@ -67,10 +67,8 @@ const Product = () => {
     const getProducts = async () => {
         try {
             const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/product`)
-            // console.log(result);
             if (result.data.status === 200) {
                 const data = result.data.data
-                console.log(data);
                 setProducts(data)
                 setTotalPage(Math.ceil(data.length / pageSize))
                 setCurrentPage(1)

@@ -4,6 +4,7 @@ import {
     CAlert, CButton, CCol, CDropdown, CDropdownItem, CDropdownMenu, CDropdownToggle,
     CForm,
     CFormInput,
+    CFormSelect,
     CListGroup, CListGroupItem, CModal, CModalBody, CModalHeader, CModalTitle, CPagination, CPaginationItem, CRow, CTable, CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow, CToast, CToastBody, CToastHeader, CToaster, CTooltip, CWidgetStatsA
 } from "@coreui/react"
 import { CChartLine } from "@coreui/react-chartjs"
@@ -28,6 +29,8 @@ const Enquire = () => {
     const [cardHolder, setCardHolder] = useState({});
     const [products, setProducts] = useState([])
 
+    const [productForLinkCard, setProductForLinkCard] = useState([])
+
     const [alert, setAlert] = useState(defaultAlert);
     const [toast, addToast] = useState(0);
     const toaster = useRef();
@@ -37,6 +40,7 @@ const Enquire = () => {
     const [pageSize, setPageSize] = useState(10)
 
     const [formControl, setFormControl] = useState(defaultForm)
+    const [formControlPLFC, setFormControlPLFC] = useState(defaultForm)
 
     const handleShowAlert = (alert) => {
         setAlert(alert)
@@ -95,15 +99,27 @@ const Enquire = () => {
                 }
             })
             if (result.data.status === 200) {
-                // console.log(result.data);
 
                 const { inspections, validations } = result.data.data;
                 const cartTime = [].concat(inspections, validations);
-                cartTime.sort((a, b) => b.transactionTime - a.transactionTime);
-                // console.log(cartTime);
+
+                const newCartTime = []
+                for (let i = 0; i < cartTime.length; i++) {
+                    if (cartTime[i].type == "VALIDATION") {
+                        const { stopEnd, stopStart, ...data } = cartTime[i]
+                        newCartTime.push({ stopStart, ...data })
+                        newCartTime.push({ stopEnd, ...data })
+                    } else {
+                        newCartTime.push(cartTime[i])
+                    }
+                }
+
+
+                newCartTime.sort((a, b) => b.transactionTime - a.transactionTime);
+                console.log(newCartTime);
                 setEnquire(result.data.data);
-                setTimeLine(cartTime);
-                setTotalPage(Math.ceil(cartTime.length / pageSize));
+                setTimeLine(newCartTime);
+                setTotalPage(Math.ceil(newCartTime.length / pageSize));
             }
         } catch (error) {
             console.log("error get enruire: ", error);
@@ -121,6 +137,18 @@ const Enquire = () => {
         } catch (error) {
             console.log("error get enruire: ", error);
             handleShowAlert({ open: true, message: `Error get product used by card`, color: "danger" })
+        }
+    }
+
+    const getProductForLinkCard = async () => {
+        try {
+            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/product`)
+            if (result.data.status === 200) {
+                const data = result.data.data
+                setProductForLinkCard(data)
+            }
+        } catch (error) {
+            handleShowAlert({ open: true, message: `Error`, color: "danger" })
         }
     }
 
@@ -150,6 +178,7 @@ const Enquire = () => {
 
     const handleCloseModal = () => {
         setFormControl(defaultForm)
+        setFormControlPLFC(defaultForm)
     }
 
     const handleOpenModalRecharge = () => {
@@ -181,10 +210,41 @@ const Enquire = () => {
         }
     }
 
+    const submitPLFC = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const values = {};
+        for (let [name, value] of formData.entries()) {
+            values[name] = value;
+        }
+
+        values.productId = +values.productId
+
+        values.serialNumber = enquire.card.serialNumber;
+        values.transactionDate = moment().format('YYYY-MM-DDTHH:mm');
+
+        try {
+            const result = await instanceAxios.post(`${process.env.URL_BACKEND}/api/v1/users/productRegister`, JSON.stringify(values))
+            if (result.data.status === 403) {
+                handleCloseModal()
+                handleShowAlert({ open: true, message: `${result.data.data}`, color: "danger" })
+            }
+            else if (result.data.status === 200) {
+                handleCloseModal()
+                getProductUsedByCard()
+                handleShowAlert({ open: true, message: `Success`, color: "success" })
+            }
+        } catch (error) {
+            // console.log("Erorr Enquire Recharge ==>> :: ", error);
+            handleShowAlert({ open: true, message: "Error Recharge", color: "danger" })
+        }
+    }
+
     useEffect(() => {
         getEnquire()
         getCardHolder()
         getProductUsedByCard()
+        getProductForLinkCard()
     }, [])
 
     // console.log(enquire);
@@ -233,8 +293,37 @@ const Enquire = () => {
                 </CModalBody>
             </CModal>
 
+            <CModal
+                scrollable
+                visible={formControlPLFC?.open}
+                onClose={() => setFormControlPLFC(defaultAlert)}
+                aria-labelledby="ScrollingLongContentExampleLabel2"
+                backdrop="static"
+            >
+                <CModalHeader>
+                    <CModalTitle id="ScrollingLongContentExampleLabel2">Product</CModalTitle>
+                </CModalHeader>
+                <CModalBody onSubmit={submitPLFC}>
+                    <CForm className="row g-3">
+
+                        <CFormSelect
+                            aria-label="Default select example"
+                            label='Product'
+                            name='productId'
+                            options={productForLinkCard.map((item) => {
+                                return { label: item?.productName, value: item?.id }
+                            })}
+                        />
+
+                        <CCol xs={12}>
+                            <CButton color="primary" type="submit">Add</CButton>
+                        </CCol>
+                    </CForm>
+                </CModalBody>
+            </CModal>
+
             <CRow>
-                <CCol sm={4}>
+                <CCol sm={3}>
                     <div>
                         <h4 style={{ color: "grey", display: "flex", justifyContent: "space-between" }}>
                             <span>Card Detail</span>
@@ -259,7 +348,7 @@ const Enquire = () => {
                                 Transit Operator: <span>{enquire?.card?.transitOperator?.operatorName}</span>
                             </CListGroupItem>
                             <CListGroupItem as="button" style={{ display: "flex", justifyContent: 'space-between' }}>
-                                <span>Balance: <span>${enquire?.card?.balance}</span></span>
+                                <span style={{ fontWeight: "bold" }} >Balance: <span>${enquire?.card?.balance}</span></span>
                                 <CButton color={"primary"} onClick={() => handleOpenModalRecharge()}>Recharge</CButton>
                             </CListGroupItem>
                         </CListGroup>
@@ -268,7 +357,7 @@ const Enquire = () => {
                     {
                         cardHolder?.id &&
                         <div>
-                            <h5 style={{ color: "grey" }}>Card holder</h5>
+                            <h5 style={{ color: "grey", margin: "16px 0 8px 0" }}>Card holder</h5>
                             <CListGroup>
                                 <CListGroupItem as="button" active>
                                     Name: {cardHolder?.firstname + " " + cardHolder.lastname}
@@ -283,22 +372,26 @@ const Enquire = () => {
                     }
 
                     {
-                        products.length > 0 &&
-                        <div>
-                            <h5 style={{ color: "grey" }}>Products</h5>
-                            {products.map((product) => (
-                                <CListGroup>
-                                    <CListGroupItem as="button" active disabled>Name: {product.productName}</CListGroupItem>
-                                    <CListGroupItem>Transit Operator: {product.transitOperator.operatorName}</CListGroupItem>
-                                    <CListGroupItem>Transport Mode: {product.transportMode.modeName}</CListGroupItem>
-                                    <CListGroupItem>Expired At: {product.expiredAt.split("T")[1]} : {product.expiredAt.split("T")[0]}</CListGroupItem>
-                                </CListGroup>
-                            ))}
-                        </div>
+                        products.length > 0 ?
+                            <div>
+                                <h5 style={{ color: "grey", margin: "16px 0 8px 0" }}>Products</h5>
+                                {products.map((product) => (
+                                    <CListGroup>
+                                        <CListGroupItem as="button" active disabled>Name: {product.productName}</CListGroupItem>
+                                        <CListGroupItem>Transit Operator: {product.transitOperator.operatorName}</CListGroupItem>
+                                        <CListGroupItem>Transport Mode: {product.transportMode.modeName}</CListGroupItem>
+                                        <CListGroupItem>Expired At: {product.expiredAt.split("T")[1]} : {product.expiredAt.split("T")[0]}</CListGroupItem>
+                                    </CListGroup>
+                                ))}
+                            </div>
+                            :
+                            <CButton type="button" color="primary" style={{ margin: "12px 0" }} onClick={() => setFormControlPLFC({ open: true, title: "Product", data: null })} >Add product</CButton>
                     }
+
+
                 </CCol>
 
-                <CCol sm={8}>
+                <CCol sm={9}>
                     <h4 style={{ color: "grey" }}>Travel Validity</h4>
                     <div>
                         <div>Choose time</div>
@@ -307,11 +400,15 @@ const Enquire = () => {
                                 <CTableHead>
                                     <CTableRow>
                                         <CTableHeaderCell scope="col">Date</CTableHeaderCell>
+                                        {/* <CTableHeaderCell scope="col">Referrence</CTableHeaderCell> */}
                                         <CTableHeaderCell scope="col">Description</CTableHeaderCell>
                                         <CTableHeaderCell scope="col">Validation</CTableHeaderCell>
                                         <CTableHeaderCell scope="col">Inspection Result</CTableHeaderCell>
-                                        <CTableHeaderCell scope="col">Inspection Referrence</CTableHeaderCell>
                                         <CTableHeaderCell scope="col">Inspection Decision</CTableHeaderCell>
+                                        <CTableHeaderCell scope="col">Line</CTableHeaderCell>
+                                        <CTableHeaderCell scope="col">Transport Mode</CTableHeaderCell>
+                                        <CTableHeaderCell scope="col">Transit Operator</CTableHeaderCell>
+                                        <CTableHeaderCell scope="col">Location</CTableHeaderCell>
                                     </CTableRow>
                                 </CTableHead>
                                 <CTableBody>
@@ -320,13 +417,29 @@ const Enquire = () => {
                                             .slice((currentPage - 1) * pageSize, currentPage * pageSize)
                                             .map((item, i) => (
                                                 <CTableRow>
-                                                    {/* {moment(enquire?.card?.issueDate).format('HH:mm:ss DD/MM/YYYY')} */}
-                                                    <CTableHeaderCell>{moment(item.transactionTime).format('HH:mm:ss DD/MM/YYYY')}</CTableHeaderCell>
+                                                    <CTableHeaderCell>
+                                                        {
+                                                            item.type == "INSPECTION" ?
+                                                                moment(item.transactionTimeStart).format('HH:mm:ss DD/MM/YYYY')
+                                                                : item?.stopStart ? moment(item.transactionTimeStart).format('HH:mm:ss DD/MM/YYYY')
+                                                                    : moment(item.transactionTimeEnd).format('HH:mm:ss DD/MM/YYYY')
+                                                        }
+                                                    </CTableHeaderCell>
+                                                    {/* <CTableDataCell>{item.id}</CTableDataCell> */}
                                                     <CTableDataCell>{item.type === "INSPECTION" ? "Inspection" : "Tap"}</CTableDataCell>
                                                     <CTableDataCell>{item.type !== "INSPECTION" ? item.result : ""}</CTableDataCell>
                                                     <CTableDataCell></CTableDataCell>
-                                                    <CTableDataCell>{item.id}</CTableDataCell>
+
                                                     <CTableDataCell>{item.type === "INSPECTION" ? item.result : ""}</CTableDataCell>
+                                                    <CTableDataCell>{item.line.lineName}</CTableDataCell>
+                                                    <CTableDataCell>{item.transportMode.modeName}</CTableDataCell>
+                                                    <CTableDataCell>{item.transportMode.transitOperator.operatorName}</CTableDataCell>
+                                                    <CTableDataCell>
+                                                        {
+                                                            item?.stopStart ? item?.stopStart?.stopName
+                                                                : item?.stopEnd?.stopName
+                                                        }
+                                                    </CTableDataCell>
                                                 </CTableRow>
                                             ))
                                     }
