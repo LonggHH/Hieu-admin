@@ -19,8 +19,7 @@ const NAVIGATEPAGE = { NEXT: 'NEXT', PREVIOUS: 'PREVIOUS' }
 
 function getIssueAndExpiryDate() {
     const now = moment();
-
-    const expiryDate = now.add(3, 'years');
+    const expiryDate = moment(now).add(3, 'years');
 
     const issueDateFormatted = now.format('YYYY-MM-DDTHH:mm:ss[Z]');
     const expiryDateFormatted = expiryDate.format('YYYY-MM-DDTHH:mm:ss[Z]');
@@ -30,6 +29,7 @@ function getIssueAndExpiryDate() {
         expiryDate: expiryDateFormatted
     };
 }
+
 
 const customTooltipStyle = {
     '--cui-tooltip-bg': 'var(--cui-primary)',
@@ -302,30 +302,40 @@ const Account = () => {
 
                         {(fclUser.data?.user) &&
 
-                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                            <div style={{ display: "flex", justifyContent: "space-between", flexDirection: "column" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+
+                                    <span>{`Card holder: ${(fclUser?.data?.user?.firstname || "") + " " + (fclUser?.data?.user?.lastname || "")}`}</span>
+
+                                    <CButton color="danger"
+                                        onClick={handleUnLinkUser}
+                                    >Unlink</CButton>
+
+                                </div>
+
                                 <CButton color="primary"
                                     onClick={gotoCardHolder}
                                 >Go to Card Holder</CButton>
-
-                                <CButton color="danger"
-                                    onClick={handleUnLinkUser}
-                                >Unlink</CButton>
                             </div>
                         }
 
-                        <CFormInput
-                            type="text"
-                            id="userNameLink"
-                            label={`Card holder: ${(fclUser?.data?.user?.firstname || "") + " " + (fclUser?.data?.user?.lastname || "")}`}
-                            placeholder=""
-                            text="Enter name user want link."
-                            aria-describedby="exampleFormControlInputHelpInline"
-                            onChange={(e) => setTextSearchUser(e.target.value)}
-                        />
+                        {!(fclUser.data?.user) &&
+                            <CFormInput
+                                type="text"
+                                id="userNameLink"
+                                label={`Card holder: ${(fclUser?.data?.user?.firstname || "") + " " + (fclUser?.data?.user?.lastname || "")}`}
+                                placeholder=""
+                                text="Enter name user want link."
+                                aria-describedby="exampleFormControlInputHelpInline"
+                                onChange={(e) => setTextSearchUser(e.target.value)}
+                            />
+                        }
+
 
                         {!(fclUser.data?.user) &&
                             users
                                 .filter((user) => (user.firstname + user.lastname).toLowerCase().includes(textSearchUser.toLowerCase()))
+                                .splice(0, 6)
                                 .map((user) => (
                                     <div key={user.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                         <span>{user.firstname + " " + user.lastname}</span>
@@ -347,7 +357,7 @@ const Account = () => {
                 <CTableHead>
                     <CTableRow>
                         <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Id</CTableHeaderCell>
+                        {/* <CTableHeaderCell scope="col">Id</CTableHeaderCell> */}
                         <CTableHeaderCell scope="col">Serial</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Type</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Date</CTableHeaderCell>
@@ -374,7 +384,7 @@ const Account = () => {
                             return (
                                 <CTableRow key={i}>
                                     <CTableHeaderCell scope="row">{i + 1}</CTableHeaderCell>
-                                    <CTableDataCell>{item.id}</CTableDataCell>
+                                    {/* <CTableDataCell>{item.id}</CTableDataCell> */}
 
                                     <CTableDataCell>
                                         {item.serialNumber}

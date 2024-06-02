@@ -107,7 +107,7 @@ const Enquire = () => {
             }
         } catch (error) {
             console.log("error get enruire: ", error);
-            handleShowAlert({ open: true, message: `Error enquire`, color: "danger" })
+            handleShowAlert({ open: true, message: `Error enquire day nay`, color: "danger" })
         }
     }
 
@@ -252,10 +252,10 @@ const Enquire = () => {
                             <CListGroupItem as="button">Issue Date: {moment(enquire?.card?.issueDate).format('DD/MM/YYYY')}</CListGroupItem>
                             <CListGroupItem as="button">Expiry Date: {moment(enquire?.card?.expiryDate).format('DD/MM/YYYY')}</CListGroupItem>
                             <CListGroupItem as="button">Type: {"Mifare Desfire " + enquire?.card?.cardType}</CListGroupItem>
-                            <CListGroupItem as="button" disabled>
+                            <CListGroupItem as="button">
                                 Status: <span>{enquire?.card?.blocked ? "Blocked" : "Active"}</span>
                             </CListGroupItem>
-                            <CListGroupItem as="button" disabled>
+                            <CListGroupItem as="button" >
                                 Transit Operator: <span>{enquire?.card?.transitOperator?.operatorName}</span>
                             </CListGroupItem>
                             <CListGroupItem as="button" style={{ display: "flex", justifyContent: 'space-between' }}>
@@ -275,7 +275,7 @@ const Enquire = () => {
                                 </CListGroupItem>
                                 <CListGroupItem as="button">Email: {cardHolder?.email}</CListGroupItem>
                                 <CListGroupItem as="button">Date of Birth :{cardHolder?.dob}</CListGroupItem>
-                                <CListGroupItem as="button" disabled>
+                                <CListGroupItem as="button" >
                                     Status: <span>{cardHolder?.enabled ? "Active" : "Inactive"}</span>
                                 </CListGroupItem>
                             </CListGroup>

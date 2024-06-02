@@ -353,12 +353,12 @@ const _nav = [
         to: '/card',
         icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
     },
-    {
-        component: CNavItem,
-        name: 'Report',
-        to: '/report',
-        icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
-    },
+    // {
+    //     component: CNavItem,
+    //     name: 'Report',
+    //     to: '/report',
+    //     icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
+    // },
     {
         component: CNavItem,
         name: 'User',
