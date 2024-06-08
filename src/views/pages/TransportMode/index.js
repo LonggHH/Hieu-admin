@@ -153,9 +153,7 @@ const TransportMode = () => {
                 <CTableHead>
                     <CTableRow>
                         <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Id</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Name</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Operator</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Action</CTableHeaderCell>
                     </CTableRow>
                 </CTableHead>
@@ -165,9 +163,7 @@ const TransportMode = () => {
                         .map((item, i) => (
                             <CTableRow key={i}>
                                 <CTableHeaderCell scope="row">{i + 1}</CTableHeaderCell>
-                                <CTableDataCell>{item.id}</CTableDataCell>
                                 <CTableDataCell>{item.modeName}</CTableDataCell>
-                                <CTableDataCell>{item.transitOperator.operatorName}</CTableDataCell>
                                 <CTableDataCell>
                                     <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }} />
                                     <span style={{ margin: 10 }}></span>

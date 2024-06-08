@@ -251,6 +251,7 @@ const Route = () => {
                                 <CTableHeaderCell scope="col">#</CTableHeaderCell>
                                 {/* <CTableHeaderCell scope="col">Id</CTableHeaderCell> */}
                                 <CTableHeaderCell scope="col">Transit Operator</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Line</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Stop A</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Stop B</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Price</CTableHeaderCell>
@@ -267,6 +268,9 @@ const Route = () => {
 
                                         <CTableDataCell>
                                             {item.transitOperator.operatorName}
+                                        </CTableDataCell>
+                                        <CTableDataCell>
+                                            {item.stopA.line.lineName}
                                         </CTableDataCell>
                                         <CTableDataCell>
                                             {item.stopA.stopName}

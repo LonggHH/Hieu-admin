@@ -166,8 +166,7 @@ const Stop = () => {
                         <CTableHeaderCell scope="col">#</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Id</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Name</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Line</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Transport mode</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Coordinator</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Action</CTableHeaderCell>
                     </CTableRow>
                 </CTableHead>
@@ -179,12 +178,7 @@ const Stop = () => {
                                 <CTableHeaderCell scope="row">{i + 1}</CTableHeaderCell>
                                 <CTableDataCell>{item.id}</CTableDataCell>
                                 <CTableDataCell>{item.stopName}</CTableDataCell>
-                                <CTableDataCell>
-                                    <span> {item.line.lineName} </span>
-                                </CTableDataCell>
-                                <CTableDataCell>
-                                    <span> {item.line.transportMode.modeName} </span>
-                                </CTableDataCell>
+                                <CTableDataCell>{item.latitude} - {item.longitude}</CTableDataCell>
                                 <CTableDataCell>
                                     <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }} />
                                     <span style={{ margin: 10 }}></span>

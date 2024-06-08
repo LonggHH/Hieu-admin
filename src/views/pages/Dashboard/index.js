@@ -289,7 +289,7 @@ const Dashboard = () => {
                             // backgroundColor: "rgba(220, 220, 220, 0.2)",
                             backgroundColor: "#e55353",
                             borderColor: "rgba(220, 220, 220, 1)",
-                            pointBackgroundColor: "rgba(220, 220, 220, 1)",
+                            pointBackgroundColor: "rgba(242, 148, 31, 0.8)",
                             pointBorderColor: "#fff",
                             data: Object.values(dataChartUser)
                         },

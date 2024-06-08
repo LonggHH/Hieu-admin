@@ -228,11 +228,9 @@ const User = () => {
                 <CTableHead>
                     <CTableRow>
                         <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Name</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Full name</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Email</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Date of Birth</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Role</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">User Name</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Action</CTableHeaderCell>
                     </CTableRow>
                 </CTableHead>
@@ -244,14 +242,11 @@ const User = () => {
                                 <CTableHeaderCell scope="row">{i + 1}</CTableHeaderCell>
                                 <CTableDataCell>{item.firstname + " " + item.lastname}</CTableDataCell>
                                 <CTableDataCell>{item.email}</CTableDataCell>
-                                <CTableDataCell>{item.dob}</CTableDataCell>
                                 <CTableDataCell>
                                     <span style={{ display: "flex", gap: 8 }}>
                                         {item.role}
                                     </span>
                                 </CTableDataCell>
-                                <CTableDataCell>{item.username}</CTableDataCell>
-
                                 <CTableDataCell>
                                     <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }} />
                                     <span style={{ margin: 10 }}></span>

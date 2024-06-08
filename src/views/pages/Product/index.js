@@ -203,9 +203,10 @@ const Product = () => {
                         <CTableHeaderCell scope="col">#</CTableHeaderCell>
                         {/* <CTableHeaderCell scope="col">Id</CTableHeaderCell> */}
                         <CTableHeaderCell scope="col">Name</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Price</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Operator</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Mpde</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Transport</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Validity Time</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Price</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Action</CTableHeaderCell>
                     </CTableRow>
                 </CTableHead>
@@ -217,9 +218,10 @@ const Product = () => {
                                 <CTableHeaderCell scope="row">{i + 1}</CTableHeaderCell>
                                 {/* <CTableDataCell>{item.id}</CTableDataCell> */}
                                 <CTableDataCell>{item.productName}</CTableDataCell>
-                                <CTableDataCell>${item.price}</CTableDataCell>
                                 <CTableDataCell>{item.transitOperator.transitOperator}</CTableDataCell>
                                 <CTableDataCell>{item.transportMode.transportMode}</CTableDataCell>
+                                <CTableDataCell>{item.validIn} day</CTableDataCell>
+                                <CTableDataCell>${item.price}</CTableDataCell>
                                 <CTableDataCell>
                                     <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }} />
                                     <span style={{ margin: 10 }}></span>

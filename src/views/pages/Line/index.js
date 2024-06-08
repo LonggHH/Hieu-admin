@@ -169,7 +169,7 @@ const Line = () => {
                         <CTableHeaderCell scope="col">#</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Id</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Name</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Transport Mode - Transit Operator</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Transport Mode</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Action</CTableHeaderCell>
                     </CTableRow>
                 </CTableHead>
@@ -182,7 +182,7 @@ const Line = () => {
                                 <CTableDataCell>{item.id}</CTableDataCell>
                                 <CTableDataCell>{item.lineName}</CTableDataCell>
                                 <CTableDataCell>
-                                    {item.transportMode.modeName} - {item.transportMode.transitOperator.operatorName}
+                                    {item.transportMode.modeName}
                                 </CTableDataCell>
                                 <CTableDataCell style={{ display: "flex", gap: 12 }}>
 

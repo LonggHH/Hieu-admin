@@ -90,7 +90,7 @@ const Account = () => {
             }
         } catch (error) {
             console.log(error);
-            handleShowAlert({ open: true, message: `Error acocunt card loi`, color: "danger" })
+            handleShowAlert({ open: true, message: `Error`, color: "danger" })
         }
     }
 
@@ -120,7 +120,7 @@ const Account = () => {
             }
         } catch (error) {
             // console.log("loi get all user: ", error);
-            handleShowAlert({ open: true, message: `Error get user loi`, color: "danger" })
+            handleShowAlert({ open: true, message: `Error`, color: "danger" })
         }
     }
 
@@ -355,9 +355,9 @@ const Account = () => {
                     <CTableRow>
                         <CTableHeaderCell scope="col">#</CTableHeaderCell>
                         {/* <CTableHeaderCell scope="col">Id</CTableHeaderCell> */}
-                        <CTableHeaderCell scope="col">Serial</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Type</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Date</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Serial number</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Card Type</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Issued Date - Expired Date</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Operator</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Status</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Action</CTableHeaderCell>
@@ -370,14 +370,14 @@ const Account = () => {
                             const dateStart = new Date(item.issueDate)
                             const dayStart = String(dateStart.getDate()).padStart(2, '0');
                             const monthStart = String(dateStart.getMonth() + 1).padStart(2, '0');
-                            const yearStart = String(dateStart.getFullYear()).slice(-2);
-                            const formattedDateStart = `${dayStart}:${monthStart}:${yearStart}`;
+                            const yearStart = String(dateStart.getFullYear());
+                            const formattedDateStart = `${dayStart}/${monthStart}/${yearStart}`;
 
                             const dateEnd = new Date(item.expiryDate)
                             const dayEnd = String(dateEnd.getDate()).padStart(2, '0');
                             const monthEnd = String(dateEnd.getMonth() + 1).padStart(2, '0');
-                            const yearEnd = String(dateEnd.getFullYear()).slice(-2);
-                            const formattedDateEnd = `${dayEnd}:${monthEnd}:${yearEnd}`;
+                            const yearEnd = String(dateEnd.getFullYear());
+                            const formattedDateEnd = `${dayEnd}/${monthEnd}/${yearEnd}`;
                             return (
                                 <CTableRow key={i}>
                                     <CTableHeaderCell scope="row">{i + 1}</CTableHeaderCell>
@@ -387,7 +387,7 @@ const Account = () => {
                                         {item.serialNumber}
                                     </CTableDataCell>
                                     <CTableDataCell>
-                                        {item.cardType}
+                                        {item.cardType == "EV1" ? "Mifare Desfire EV1" : ""}
                                     </CTableDataCell>
                                     <CTableDataCell>
                                         {formattedDateStart} - {formattedDateEnd}
@@ -396,7 +396,7 @@ const Account = () => {
                                         {item.transitOperator.operatorName}
                                     </CTableDataCell>
                                     <CTableDataCell>
-                                        {item.blocked ? "Block" : "UnLock"}
+                                        {item.blocked ? "Blocked" : "Active"}
                                     </CTableDataCell>
                                     <CTableDataCell style={{ display: "flex", gap: 8 }}>
                                         <CTooltip

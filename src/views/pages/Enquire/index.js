@@ -363,7 +363,7 @@ const Enquire = () => {
                                     Name: {cardHolder?.firstname + " " + cardHolder.lastname}
                                 </CListGroupItem>
                                 <CListGroupItem as="button">Email: {cardHolder?.email}</CListGroupItem>
-                                <CListGroupItem as="button">Date of Birth :{cardHolder?.dob}</CListGroupItem>
+                                <CListGroupItem as="button">Date of Birth: {cardHolder?.dob ?? "17/07/2001"}</CListGroupItem>
                                 <CListGroupItem as="button" >
                                     Status: <span>{cardHolder?.enabled ? "Active" : "Inactive"}</span>
                                 </CListGroupItem>
@@ -375,14 +375,21 @@ const Enquire = () => {
                         products.length > 0 ?
                             <div>
                                 <h5 style={{ color: "grey", margin: "16px 0 8px 0" }}>Products</h5>
-                                {products.map((product) => (
-                                    <CListGroup>
-                                        <CListGroupItem as="button" active disabled>Name: {product.productName}</CListGroupItem>
-                                        <CListGroupItem>Transit Operator: {product.transitOperator.operatorName}</CListGroupItem>
-                                        <CListGroupItem>Transport Mode: {product.transportMode.modeName}</CListGroupItem>
-                                        <CListGroupItem>Expired At: {product.expiredAt.split("T")[1]} : {product.expiredAt.split("T")[0]}</CListGroupItem>
-                                    </CListGroup>
-                                ))}
+                                {products.map((product) => {
+                                    const expiredAt = new Date(product.expiredAt);
+                                    const formattedExpiredDate = `${expiredAt.getDate().toString().padStart(2, '0')}/${(expiredAt.getMonth() + 1).toString().padStart(2, '0')}/${expiredAt.getFullYear()} ${expiredAt.getHours().toString().padStart(2, '0')}:${expiredAt.getMinutes().toString().padStart(2, '0')}`;
+                                    const formattedStartedDate = `${(expiredAt.getDate() - product.validIn).toString().padStart(2, '0')}/${(expiredAt.getMonth() + 1).toString().padStart(2, '0')}/${expiredAt.getFullYear()} ${expiredAt.getHours().toString().padStart(2, '0')}:${expiredAt.getMinutes().toString().padStart(2, '0')}`;
+
+                                    return (
+                                        <CListGroup key={product.id}>
+                                            <CListGroupItem as="button" active disabled>Name: {product.productName}</CListGroupItem>
+                                            <CListGroupItem>Transit Operator: {product.transitOperator.operatorName}</CListGroupItem>
+                                            <CListGroupItem>Transport Mode: {product.transportMode.modeName}</CListGroupItem>
+                                            <CListGroupItem>Started At: {formattedStartedDate}</CListGroupItem>
+                                            <CListGroupItem>Expired At: {formattedExpiredDate}</CListGroupItem>
+                                        </CListGroup>
+                                    );
+                                })}
                             </div>
                             :
                             <CButton type="button" color="primary" style={{ margin: "12px 0" }} onClick={() => setFormControlPLFC({ open: true, title: "Product", data: null })} >Add product</CButton>
@@ -394,7 +401,6 @@ const Enquire = () => {
                 <CCol sm={9}>
                     <h4 style={{ color: "grey" }}>Travel Validity</h4>
                     <div>
-                        <div>Choose time</div>
                         <div>
                             <CTable hover>
                                 <CTableHead>
@@ -409,6 +415,7 @@ const Enquire = () => {
                                         <CTableHeaderCell scope="col">Transport Mode</CTableHeaderCell>
                                         <CTableHeaderCell scope="col">Transit Operator</CTableHeaderCell>
                                         <CTableHeaderCell scope="col">Location</CTableHeaderCell>
+                                        <CTableHeaderCell scope="col">Fee</CTableHeaderCell>
                                     </CTableRow>
                                 </CTableHead>
                                 <CTableBody>
@@ -433,13 +440,14 @@ const Enquire = () => {
                                                     <CTableDataCell>{item.type === "INSPECTION" ? item.result : ""}</CTableDataCell>
                                                     <CTableDataCell>{item.line.lineName}</CTableDataCell>
                                                     <CTableDataCell>{item.transportMode.modeName}</CTableDataCell>
-                                                    <CTableDataCell>{item.transportMode.transitOperator.operatorName}</CTableDataCell>
+                                                    <CTableDataCell>{item.transit.operatorName}</CTableDataCell>
                                                     <CTableDataCell>
                                                         {
                                                             item?.stopStart ? item?.stopStart?.stopName
                                                                 : item?.stopEnd?.stopName
                                                         }
                                                     </CTableDataCell>
+                                                    <CTableDataCell>${item.fee}</CTableDataCell>
                                                 </CTableRow>
                                             ))
                                     }

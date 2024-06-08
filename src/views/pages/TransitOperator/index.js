@@ -74,7 +74,7 @@ const TransitOperator = () => {
         try {
             const result = await instanceAxios.post(`/api/v1/location/transit_operator`, JSON.stringify(values))
             // const token = JSON.parse(localStorage.getItem('account_admin'));
-            // const result = await axios.post(`http://192.168.0.102:8000/api/v1/location/transit_operator`, JSON.stringify(values), {
+            // const result = await axios.post(`http://localhost:8000/api/v1/location/transit_operator`, JSON.stringify(values), {
             //     headers: {
             //         "Content-Type": "application/json",
             //         Authorization: `Bear`
@@ -135,8 +135,7 @@ const TransitOperator = () => {
                 <CTableHead>
                     <CTableRow>
                         <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Id</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Name</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Operator name</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Action</CTableHeaderCell>
                     </CTableRow>
                 </CTableHead>
@@ -146,7 +145,6 @@ const TransitOperator = () => {
                         .map((item, i) => (
                             <CTableRow key={i}>
                                 <CTableHeaderCell scope="row">{i + 1}</CTableHeaderCell>
-                                <CTableDataCell>{item.id}</CTableDataCell>
                                 <CTableDataCell>{item.operatorName}</CTableDataCell>
                                 <CTableDataCell>
                                     <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }} />
