@@ -278,7 +278,7 @@ const Account = () => {
                         />
 
                         <CCol xs={12}>
-                            <CButton color="primary" type="submit">{formControl.title}</CButton>
+                            <CButton className="custom-button" color="primary" type="submit">{formControl.title}</CButton>
                         </CCol>
                     </CForm>
                 </CModalBody>
@@ -304,13 +304,13 @@ const Account = () => {
 
                                     <span>{`Card holder: ${(fclUser?.data?.user?.firstname || "") + " " + (fclUser?.data?.user?.lastname || "")}`}</span>
 
-                                    <CButton color="danger"
+                                    <CButton className="custom-button" color="danger"
                                         onClick={handleUnLinkUser}
                                     >Unlink</CButton>
 
                                 </div>
 
-                                <CButton color="primary"
+                                <CButton className="custom-button" color="primary"
                                     onClick={gotoCardHolder}
                                 >Go to Card Holder</CButton>
                             </div>
@@ -347,7 +347,7 @@ const Account = () => {
             </CModal>
 
             <div style={{ marginBottom: 12 }}>
-                <CButton color="primary" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Add card</CButton>
+                <CButton className="custom-button" color="primary" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Add card</CButton>
             </div>
 
             <CTable hover>

@@ -29,7 +29,7 @@ const customDot = (dot, { status, index }) => (
 
 const Route = () => {
 
-    const lineIdChoose = JSON.parse(localStorage.getItem("line_id_choose"))
+    const lineChoose = JSON.parse(localStorage.getItem("line_id_choose"))
 
     const [alert, setAlert] = useState(defaultAlert)
     const [viewMode, setViewMode] = useState(true);
@@ -68,14 +68,16 @@ const Route = () => {
     const getStops = async () => {
         try {
             const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/stop`)
+            console.log("get stop", result.data.data);
             if (result.data.status === 200) {
                 let data = result.data.data
-                data = data.filter(el => el.line.id == lineIdChoose)
+                // data = data.filter(el => el.line.id == lineChoose.id)
                 setStop(data)
-                setTotalPage(Math.ceil(data.length / pageSize))
-                setCurrentPage(1)
+                // setTotalPage(Math.ceil(data.length / pageSize))
+                // setCurrentPage(1)
             }
         } catch (error) {
+            console.log(error);
             handleShowAlert({ open: true, message: `Error stop`, color: "danger" })
         }
     }
@@ -84,7 +86,7 @@ const Route = () => {
         try {
             const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/route`)
             if (result.data.status === 200) {
-                const data = result.data.data
+                const data = result.data.data.filter(el => el.lineId == lineChoose.id)
                 setRoute(data)
             }
         } catch (error) {
@@ -170,11 +172,12 @@ const Route = () => {
     let viewStopIndex = stopIndex.filter((_, i) => i < 2).sort((a, b) => a - b)
 
     const price = route.find(el =>
-        el.stopA.stopName == stop[viewStopIndex[0]].stopName &&
-        el.stopB.stopName == stop[viewStopIndex[1]].stopName
+        el.stopStart.stopName == stop[viewStopIndex[0]].stopName &&
+        el.stopEnd.stopName == stop[viewStopIndex[1]].stopName
     )
+    // const price = 0
 
-    console.log(route);
+    console.log("route ::", route);
 
     return (
         <>
@@ -252,8 +255,8 @@ const Route = () => {
                                 {/* <CTableHeaderCell scope="col">Id</CTableHeaderCell> */}
                                 <CTableHeaderCell scope="col">Transit Operator</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Line</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Stop A</CTableHeaderCell>
-                                <CTableHeaderCell scope="col">Stop B</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Stop start</CTableHeaderCell>
+                                <CTableHeaderCell scope="col">Stop end</CTableHeaderCell>
                                 <CTableHeaderCell scope="col">Price</CTableHeaderCell>
                                 {/* <CTableHeaderCell scope="col">Action</CTableHeaderCell> */}
                             </CTableRow>
@@ -270,16 +273,16 @@ const Route = () => {
                                             {item.transitOperator.operatorName}
                                         </CTableDataCell>
                                         <CTableDataCell>
-                                            {item.stopA.line.lineName}
+                                            {lineChoose.lineName}
                                         </CTableDataCell>
                                         <CTableDataCell>
-                                            {item.stopA.stopName}
+                                            {item?.stopStart?.stopName}
                                         </CTableDataCell>
                                         <CTableDataCell>
-                                            {item.stopB.stopName}
+                                            {item?.stopEnd?.stopName}
                                         </CTableDataCell>
                                         <CTableDataCell>
-                                            ${item.price}
+                                            ${item?.price}
                                         </CTableDataCell>
                                         {/* <CTableDataCell>
                                     <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }} />

@@ -103,7 +103,7 @@ const Enquire = () => {
                 const { inspections, validations } = result.data.data;
                 const cartTime = [].concat(inspections, validations);
 
-                const newCartTime = []
+                let newCartTime = []
                 for (let i = 0; i < cartTime.length; i++) {
                     if (cartTime[i].type == "VALIDATION") {
                         const { stopEnd, stopStart, ...data } = cartTime[i]
@@ -113,17 +113,16 @@ const Enquire = () => {
                         newCartTime.push(cartTime[i])
                     }
                 }
-
-
-                newCartTime.sort((a, b) => b.transactionTime - a.transactionTime);
+                newCartTime.sort((a, b) => new Date(b.transactionTimeStart) - new Date(a.transactionTimeStart));
+                newCartTime = newCartTime.filter(el => el.transactionTimeEnd == el.transactionTimeStart)
                 console.log(newCartTime);
                 setEnquire(result.data.data);
                 setTimeLine(newCartTime);
                 setTotalPage(Math.ceil(newCartTime.length / pageSize));
             }
         } catch (error) {
-            console.log("error get enruire: ", error);
-            handleShowAlert({ open: true, message: `Error enquire day nay`, color: "danger" })
+            // console.log("error get enruire: ", error);
+            handleShowAlert({ open: true, message: `Error`, color: "danger" })
         }
     }
 
@@ -316,7 +315,7 @@ const Enquire = () => {
                         />
 
                         <CCol xs={12}>
-                            <CButton color="primary" type="submit">Add</CButton>
+                            <CButton color="primary" type="submit" className="custom-button">Add</CButton>
                         </CCol>
                     </CForm>
                 </CModalBody>
@@ -349,7 +348,7 @@ const Enquire = () => {
                             </CListGroupItem>
                             <CListGroupItem as="button" style={{ display: "flex", justifyContent: 'space-between' }}>
                                 <span style={{ fontWeight: "bold" }} >Balance: <span>${enquire?.card?.balance}</span></span>
-                                <CButton color={"primary"} onClick={() => handleOpenModalRecharge()}>Recharge</CButton>
+                                <CButton color={"primary"} className="custom-button" onClick={() => handleOpenModalRecharge()}>Recharge</CButton>
                             </CListGroupItem>
                         </CListGroup>
                     </div>
@@ -392,7 +391,7 @@ const Enquire = () => {
                                 })}
                             </div>
                             :
-                            <CButton type="button" color="primary" style={{ margin: "12px 0" }} onClick={() => setFormControlPLFC({ open: true, title: "Product", data: null })} >Add product</CButton>
+                            <CButton type="button" className="custom-button" style={{ margin: "12px 0" }} onClick={() => setFormControlPLFC({ open: true, title: "Product", data: null })} >Add product</CButton>
                     }
 
 

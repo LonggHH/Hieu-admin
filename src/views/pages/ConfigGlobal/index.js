@@ -163,7 +163,7 @@ const ConfigGlobal = () => {
             </div>
 
             <div style={{ marginBottom: 12, display: 'flex', justifyContent: "center" }}>
-                <CButton color="primary" onClick={() => setFormControl({ open: true, title: 'Update', data: configGlobal })}>Edit</CButton>
+                <CButton className="custom-button" color="primary" onClick={() => setFormControl({ open: true, title: 'Update', data: configGlobal })}>Edit</CButton>
             </div>
         </>
     )

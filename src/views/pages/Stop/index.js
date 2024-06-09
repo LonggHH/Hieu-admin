@@ -140,24 +140,67 @@ const Stop = () => {
                                 defaultValue={formControl.data?.longitude} />
                         </CCol>
 
-                        <CFormSelect
+                        {/* <CFormSelect
                             aria-label="Default select example"
                             label='Line'
                             name='line'
                             options={line.map((item) => {
                                 return { label: item.lineName, value: item.id }
                             })}
-                        />
+                        /> */}
 
                         <CCol xs={12}>
-                            <CButton color="primary" type="submit">{formControl.title}</CButton>
+                            <CButton className="custom-button" color="primary" type="submit">{formControl.title}</CButton>
                         </CCol>
                     </CForm>
                 </CModalBody>
             </CModal>
 
+            <CModal
+                scrollable
+                visible={formControl.open}
+                onClose={() => handleCloseModal}
+                aria-labelledby="ScrollingLongContentExampleLabel2"
+                backdrop="static"
+            >
+                <CModalHeader>
+                    <CModalTitle id="ScrollingLongContentExampleLabel2">Stop</CModalTitle>
+                </CModalHeader>
+                <CModalBody onSubmit={onSubmit}>
+                    <CForm className="row g-3">
+                        <CCol xs={12}>
+                            <CFormInput id="stopName" name="stopName" label="Name" placeholder="Ga Cat Linh"
+                                defaultValue={formControl.data?.stopName} />
+                        </CCol>
+
+                        <CCol xs={6}>
+                            <CFormInput id="latitude" name="latitude" label="Latitude" placeholder="100.1"
+                                defaultValue={formControl.data?.latitude} />
+                        </CCol>
+                        <CCol xs={6}>
+                            <CFormInput id="longitude" name="longitude" label="Longitude" placeholder="100.1"
+                                defaultValue={formControl.data?.longitude} />
+                        </CCol>
+
+                        {/* <CFormSelect
+                            aria-label="Default select example"
+                            label='Line'
+                            name='line'
+                            options={line.map((item) => {
+                                return { label: item.lineName, value: item.id }
+                            })}
+                        /> */}
+
+                        <CCol xs={12}>
+                            <CButton className="custom-button" color="primary" type="submit">{formControl.title}</CButton>
+                        </CCol>
+                    </CForm>
+                </CModalBody>
+            </CModal>
+
+
             <div style={{ marginBottom: 12 }}>
-                <CButton color="primary" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Add</CButton>
+                <CButton className="custom-button" color="primary" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Add</CButton>
             </div>
 
             <CTable hover>

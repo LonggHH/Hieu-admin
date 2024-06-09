@@ -1,29 +1,31 @@
 import {
-    CAlert, CButton, CCol, CForm, CFormInput, CFormSelect, CModal, CModalBody,
+    CAlert, CButton, CCol, CForm, CFormInput, CModal, CModalBody,
     CModalHeader, CModalTitle, CPagination, CPaginationItem, CTable,
     CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow
 } from "@coreui/react"
 import { useEffect, useState } from "react"
 import axios from "axios"
+import instanceAxios from "../../../configs/axiosConfig"
 import CIcon from "@coreui/icons-react"
 import * as icon from '@coreui/icons';
+import { Switch } from "antd"
 
 const defaultAlert = { open: false, message: "", color: "primary" }
 const defaultForm = { open: false, title: 'Add', data: null }
 const NAVIGATEPAGE = { NEXT: 'NEXT', PREVIOUS: 'PREVIOUS' }
 
-const TransportMode = () => {
+const DeviceManage = () => {
 
     const [alert, setAlert] = useState(defaultAlert)
+    const [deviceMange, setDeviceMange] = useState([])
 
-    const [transitOperator, setTransitOperator] = useState([])
-    const [transportMode, setTransportMode] = useState([])
 
     const [totalPage, setTotalPage] = useState(1)
     const [currentPage, setCurrentPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
 
     const [formControl, setFormControl] = useState(defaultForm)
+    const [operatorLinkMode, setOperatorLinkMode] = useState([])
 
     const handleCloseModal = () => {
         setFormControl({ ...defaultForm })
@@ -36,28 +38,17 @@ const TransportMode = () => {
         }, 2000)
     }
 
-    const getTransitOperators = async () => {
+    const getDeviceMange = async () => {
         try {
-            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/transit_operator`)
-            if (result.data.status === 200) {
-                setTransitOperator(result.data.data)
-            }
-        } catch (error) {
-            handleShowAlert({ open: true, message: `Error`, color: "danger" })
-        }
-    }
-
-    const getTransportModes = async () => {
-        try {
-            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/transport_mode`)
+            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/security/devices`,)
             if (result.data.status === 200) {
                 const data = result.data.data
-                setTransportMode(data)
+                setDeviceMange(data)
                 setTotalPage(Math.ceil(data.length / pageSize))
                 setCurrentPage(1)
             }
         } catch (error) {
-            handleShowAlert({ open: true, message: `Error`, color: "danger" })
+            handleShowAlert({ open: true, message: `Error get `, color: "danger" })
         }
     }
 
@@ -80,31 +71,59 @@ const TransportMode = () => {
             values[name] = value;
         }
 
-        const data = { ...values }
-        data.transitOperator = {
-            id: values.transitOperator
+        const data = {
+            ...values,
+            isActive: true
         }
 
+        console.log(data);
+
+        // const token = JSON.parse(localStorage.getItem('account_admin'));
         try {
-            const result = await axios.post(`${process.env.URL_BACKEND}/api/v1/location/transport_mode`, JSON.stringify(data), {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            if (result.data.status === 201) {
+
+            const result = await instanceAxios.post(`/api/v1/security/devices`, JSON.stringify(data))
+            console.log(result);
+            if (result.data.status === 200) {
                 handleCloseModal()
                 handleShowAlert({ open: true, message: "Success", color: "primary" })
-                getTransportModes()
+                getDeviceMange()
             }
         } catch (error) {
-            handleShowAlert({ open: true, message: "Error", color: "danger" })
+            // console.log("transit operator: ", error);
+            handleCloseModal()
+            handleShowAlert({ open: true, message: "Errorr", color: "danger" })
+        }
+    }
+
+
+    const changeActive = async (data) => {
+        const newData = {
+            ...data,
+            active: !data.active
+        }
+
+        console.log(data, newData);
+        try {
+
+            const result = await instanceAxios.post(`/api/v1/security/devices`, JSON.stringify(newData))
+            console.log(result);
+            if (result.data.status === 200) {
+                // handleCloseModal()
+                // handleShowAlert({ open: true, message: "Success", color: "primary" })
+                getDeviceMange()
+            }
+        } catch (error) {
+            // console.log("transit operator: ", error);
+            // handleCloseModal()
+            handleShowAlert({ open: true, message: "Errorr", color: "danger" })
         }
     }
 
     useEffect(() => {
-        getTransitOperators()
-        getTransportModes()
+        getDeviceMange()
     }, [])
+
+    console.log(deviceMange);
 
     return (
         <>
@@ -116,59 +135,63 @@ const TransportMode = () => {
             <CModal
                 scrollable
                 visible={formControl.open}
-                onClose={() => handleCloseModal}
+                onClose={handleCloseModal}
+                backdrop="static"
                 aria-labelledby="ScrollingLongContentExampleLabel2"
             >
                 <CModalHeader>
-                    <CModalTitle id="ScrollingLongContentExampleLabel2">Transport Mode</CModalTitle>
+                    <CModalTitle id="ScrollingLongContentExampleLabel2">Device</CModalTitle>
                 </CModalHeader>
                 <CModalBody onSubmit={onSubmit}>
                     <CForm className="row g-3">
+
                         <CCol xs={12}>
-                            <CFormInput id="modeName" name="modeName" label="Name" placeholder="Bus"
-                                defaultValue={formControl.data?.modeName} />
+                            <CFormInput id="deviceId" name="deviceId" label="Id"
+                            />
                         </CCol>
 
-                        {/* <CFormSelect
-                            aria-label="Default select example"
-                            label='Transit Operator'
-                            name='transitOperator'
-                            options={transitOperator.map((item) => {
-                                return { label: item.operatorName, value: item.id }
-                            })}
-                        /> */}
+                        <CCol xs={12}>
+                            <CFormInput id="operatorName" name="deviceName" label="Name"
+                            />
+                        </CCol>
 
                         <CCol xs={12}>
-                            <CButton className="custom-button" color="primary" type="submit">{formControl.title}</CButton>
+                            <CButton className="custom-button" color="primary" type="submit">Submit</CButton>
                         </CCol>
                     </CForm>
                 </CModalBody>
             </CModal>
 
             <div style={{ marginBottom: 12 }}>
-                <CButton className="custom-button" color="primary" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Add</CButton>
+                <CButton color="primary" className="custom-button" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Add</CButton>
             </div>
 
             <CTable hover>
                 <CTableHead>
                     <CTableRow>
                         <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Name</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Action</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Device Id</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Device Name</CTableHeaderCell>
+                        <CTableHeaderCell scope="col">Status</CTableHeaderCell>
                     </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                    {transportMode
+                    {deviceMange
                         .slice((currentPage - 1) * pageSize, currentPage * pageSize)
                         .map((item, i) => (
                             <CTableRow key={i}>
                                 <CTableHeaderCell scope="row">{i + 1}</CTableHeaderCell>
-                                <CTableDataCell>{item.modeName}</CTableDataCell>
+                                <CTableDataCell>{item.deviceId}</CTableDataCell>
+                                <CTableDataCell>{item.deviceName}</CTableDataCell>
                                 <CTableDataCell>
-                                    <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }} />
+                                    <Switch onChange={() => changeActive(item)} checked={item.active} />
+                                </CTableDataCell>
+                                {/* <CTableDataCell>
+                                    <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }}
+                                    />
                                     <span style={{ margin: 10 }}></span>
                                     <CIcon icon={icon.cilXCircle} size='xl' style={{ cursor: "pointer", color: "#e55353" }} />
-                                </CTableDataCell>
+                                </CTableDataCell> */}
                             </CTableRow>
                         ))}
                 </CTableBody>
@@ -195,4 +218,4 @@ const TransportMode = () => {
     )
 }
 
-export default TransportMode
+export default DeviceManage

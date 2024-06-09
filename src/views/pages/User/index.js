@@ -214,14 +214,14 @@ const User = () => {
                         </CCol>
 
                         <CCol xs={12}>
-                            <CButton color="primary" type="submit">Create</CButton>
+                            <CButton className="custom-button" color="primary" type="submit">Create</CButton>
                         </CCol>
                     </CForm>
                 </CModalBody>
             </CModal>
 
             <div style={{ marginBottom: 12, display: "flex", justifyContent: "end" }}>
-                <CButton color="primary" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Create</CButton>
+                <CButton className="custom-button" color="primary" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Create</CButton>
             </div>
 
             <CTable hover>

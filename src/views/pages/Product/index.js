@@ -187,14 +187,14 @@ const Product = () => {
                         />
 
                         <CCol xs={12}>
-                            <CButton color="primary" type="submit">{formControl.title}</CButton>
+                            <CButton className="custom-button" color="primary" type="submit">{formControl.title}</CButton>
                         </CCol>
                     </CForm>
                 </CModalBody>
             </CModal>
 
             <div style={{ marginBottom: 12 }}>
-                <CButton color="primary" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Add</CButton>
+                <CButton className="custom-button" color="primary" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Add</CButton>
             </div>
 
             <CTable hover>

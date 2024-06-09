@@ -19,3 +19,18 @@
     background-size: cover;
     background-position: center;
 }
+
+.custom-button {
+    background-color: #DB3022;
+    border-color: #DB3022;
+    /* Màu nền tùy chỉnh */
+    color: white;
+    /* Màu chữ */
+}
+
+.custom-button:hover {
+    background-color: #DB3022;
+    border-color: #DB3022;
+    color: white;
+    /* Màu nền khi hover */
+}

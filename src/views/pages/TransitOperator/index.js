@@ -8,6 +8,7 @@ import axios from "axios"
 import instanceAxios from "../../../configs/axiosConfig"
 import CIcon from "@coreui/icons-react"
 import * as icon from '@coreui/icons';
+import { Switch } from "antd"
 
 const defaultAlert = { open: false, message: "", color: "primary" }
 const defaultForm = { open: false, title: 'Add', data: null }
@@ -17,12 +18,14 @@ const TransitOperator = () => {
 
     const [alert, setAlert] = useState(defaultAlert)
     const [transitOperator, setTransitOperator] = useState([])
+    const [transportMode, setTransportMode] = useState([])
 
     const [totalPage, setTotalPage] = useState(1)
     const [currentPage, setCurrentPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
 
     const [formControl, setFormControl] = useState(defaultForm)
+    const [operatorLinkMode, setOperatorLinkMode] = useState([])
 
     const handleCloseModal = () => {
         setFormControl({ ...defaultForm })
@@ -72,15 +75,9 @@ const TransitOperator = () => {
 
         // const token = JSON.parse(localStorage.getItem('account_admin'));
         try {
+
             const result = await instanceAxios.post(`/api/v1/location/transit_operator`, JSON.stringify(values))
-            // const token = JSON.parse(localStorage.getItem('account_admin'));
-            // const result = await axios.post(`http://localhost:8000/api/v1/location/transit_operator`, JSON.stringify(values), {
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //         Authorization: `Bear`
-            //     }
-            // })
-            console.log(result);
+            // console.log(result);
             if (result.data.status === 201) {
                 handleCloseModal()
                 handleShowAlert({ open: true, message: "Success", color: "primary" })
@@ -93,9 +90,55 @@ const TransitOperator = () => {
         }
     }
 
+    const getTransportModes = async () => {
+        try {
+            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/transport_mode`)
+            if (result.data.status === 200) {
+                const data = result.data.data
+                // console.log(data);
+                setTransportMode(data)
+            }
+        } catch (error) {
+            handleShowAlert({ open: true, message: `Error`, color: "danger" })
+        }
+    }
+
+    const handleClickLinkMode = async (modeId, operatorId) => {
+        const data = {
+            transportModeId: modeId,
+            transitOperatorId: operatorId
+        }
+        try {
+            const result = await instanceAxios.post(`/api/v1/location/operator_transport`, JSON.stringify(data))
+            if (result.data.status === 200) {
+                setFormControl(defaultForm)
+                getTransitOperators()
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleClickEdit = async (operator) => {
+        try {
+
+            const result = await instanceAxios.get(`/api/v1/location/operator_transport/${operator.id}`)
+            console.log(result.data.data);
+            if (result.data.status === 200) {
+                setOperatorLinkMode(result.data.data)
+                setFormControl({ open: true, title: "Update", data: operator })
+            }
+        } catch (error) {
+            console.log("transit operator: ", error);
+        }
+    }
+
     useEffect(() => {
         getTransitOperators()
+        getTransportModes()
     }, [])
+
+    console.log(transitOperator);
 
     return (
         <>
@@ -120,15 +163,47 @@ const TransitOperator = () => {
                             <CFormInput id="operatorName" name="operatorName" label="Name" placeholder="Ha Noi"
                                 defaultValue={formControl.data?.operatorName} />
                         </CCol>
+
                         <CCol xs={12}>
-                            <CButton color="primary" type="submit">Submit</CButton>
+                            {formControl.title === "Update" && transportMode.map((mode) => {
+                                const check = operatorLinkMode.some(el => el.transitOperatorId == formControl.data.id && el.transportModeId == mode.id)
+                                return (
+                                    <div key={mode.id} className="d-flex">
+                                        <CFormInput type="text" id="staticEmail" defaultValue={mode.modeName} readOnly plainText />
+                                        {
+                                            check ?
+                                                <Switch
+                                                    checked={check}
+                                                    checkedChildren=""
+                                                    unCheckedChildren=""
+                                                    onChange={() => {
+                                                        handleClickLinkMode(mode.id, formControl.data.id)
+                                                    }}
+                                                />
+                                                :
+                                                <Switch
+                                                    checked={check}
+                                                    checkedChildren=""
+                                                    unCheckedChildren=""
+                                                    onChange={() => {
+                                                        handleClickLinkMode(mode.id, formControl.data.id)
+                                                    }}
+                                                />
+                                        }
+                                    </div>
+                                )
+                            })}
+                        </CCol>
+
+                        <CCol xs={12}>
+                            <CButton className="custom-button" color="primary" type="submit">Submit</CButton>
                         </CCol>
                     </CForm>
                 </CModalBody>
             </CModal>
 
             <div style={{ marginBottom: 12 }}>
-                <CButton color="primary" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Add</CButton>
+                <CButton color="primary" className="custom-button" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Add</CButton>
             </div>
 
             <CTable hover>
@@ -147,7 +222,9 @@ const TransitOperator = () => {
                                 <CTableHeaderCell scope="row">{i + 1}</CTableHeaderCell>
                                 <CTableDataCell>{item.operatorName}</CTableDataCell>
                                 <CTableDataCell>
-                                    <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }} />
+                                    <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }}
+                                        onClick={() => handleClickEdit(item)}
+                                    />
                                     <span style={{ margin: 10 }}></span>
                                     <CIcon icon={icon.cilXCircle} size='xl' style={{ cursor: "pointer", color: "#e55353" }} />
                                 </CTableDataCell>

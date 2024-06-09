@@ -1,6 +1,6 @@
 import {
-    CAlert, CButton, CCol, CForm, CFormInput, CFormSelect, CModal, CModalBody,
-    CModalHeader, CModalTitle, CPagination, CPaginationItem, CTable,
+    CAlert, CButton, CCol, CForm, CFormInput, CFormLabel, CFormSelect, CModal, CModalBody,
+    CModalHeader, CModalTitle, CPagination, CPaginationItem, CRow, CTable,
     CTableBody, CTableDataCell, CTableHead, CTableHeaderCell, CTableRow,
     CTooltip
 } from "@coreui/react"
@@ -9,6 +9,7 @@ import axios from "axios"
 import CIcon from "@coreui/icons-react"
 import * as icon from '@coreui/icons';
 import { useNavigate } from "react-router-dom";
+import { Switch } from "antd";
 
 const defaultAlert = { open: false, message: "", color: "primary" }
 const defaultForm = { open: false, title: 'Add', data: null }
@@ -32,6 +33,9 @@ const Line = () => {
     const [pageSize, setPageSize] = useState(10)
 
     const [formControl, setFormControl] = useState(defaultForm)
+    const [formLinkStop, setFormLinkStop] = useState(defaultForm)
+    const [stops, setStops] = useState([])
+    const [stopInALine, setStopInALine] = useState([])
 
     const handleCloseModal = () => {
         setFormControl({ ...defaultForm })
@@ -64,6 +68,19 @@ const Line = () => {
                 setLine(data)
                 setTotalPage(Math.ceil(data.length / pageSize))
                 setCurrentPage(1)
+            }
+        } catch (error) {
+            handleShowAlert({ open: true, message: `Error`, color: "danger" })
+        }
+    }
+
+    const getStops = async () => {
+        try {
+            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/stop`)
+            if (result.data.status === 200) {
+                const data = result.data.data
+                setStops(data)
+
             }
         } catch (error) {
             handleShowAlert({ open: true, message: `Error`, color: "danger" })
@@ -110,14 +127,93 @@ const Line = () => {
         }
     }
 
-    const linkToRoute = (id) => {
-        localStorage.setItem("line_id_choose", JSON.stringify(id))
+    const linkToRoute = (item) => {
+        localStorage.setItem("line_id_choose", JSON.stringify(item))
         navigate("/route")
+    }
+
+    const onSubmitLinkStop = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const values = {};
+        for (let [name, value] of formData.entries()) {
+            values[name] = value;
+        }
+
+        let data = { ...values }
+        data = Object.fromEntries(
+            Object.entries(data).filter(([key, value]) => value != null && value !== "")
+        );
+        data = Object.entries(data).map(([key, value]) => ({
+            lineId: formLinkStop.data.id,
+            stopId: Number(key),
+            order: Number(value)
+        }));
+
+
+        try {
+            const result = await axios.post(`${process.env.URL_BACKEND}/api/v1/location/line_stops`, JSON.stringify(data), {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            console.log(result);
+            if (result.data.status === 200) {
+                setFormLinkStop(defaultForm)
+                setStopInALine([])
+            }
+        } catch (error) {
+            handleShowAlert({ open: true, message: "Error onSubmitLinkStop", color: "danger" })
+        }
+    }
+
+    const handleClickLinkMode = async (stop) => {
+
+        const data = [{
+            lineId: formLinkStop.data.id,
+            stopId: Number(stop.id),
+            order: stopInALine.length + 1
+        }]
+
+        console.log(data);
+
+        try {
+            const result = await axios.post(`${process.env.URL_BACKEND}/api/v1/location/line_stops`, JSON.stringify(data), {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            console.log(result);
+            if (result.data.status === 200) {
+                setFormLinkStop(defaultForm)
+                setStopInALine([])
+
+                // setFormLinkStop(defaultForm)
+                // setStopInALine([])
+            }
+        } catch (error) {
+            console.log("error  ", error);
+            handleShowAlert({ open: true, message: "Error handleClickLinkMode", color: "danger" })
+        }
+    }
+
+    const getStopInALine = async (line) => {
+        try {
+            const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/line_stops/${line.id}`)
+            console.log(result.data.data);
+            if (result.data.status === 200) {
+                const data = result.data.data
+                setStopInALine(data)
+            }
+        } catch (error) {
+            handleShowAlert({ open: true, message: `Error`, color: "danger" })
+        }
     }
 
     useEffect(() => {
         getTransportModes()
         getLines()
+        getStops()
     }, [])
 
     return (
@@ -130,7 +226,7 @@ const Line = () => {
             <CModal
                 scrollable
                 visible={formControl.open}
-                onClose={() => handleCloseModal}
+                onClose={handleCloseModal}
                 aria-labelledby="ScrollingLongContentExampleLabel2"
             >
                 <CModalHeader>
@@ -153,21 +249,84 @@ const Line = () => {
                         />
 
                         <CCol xs={12}>
-                            <CButton color="primary" type="submit">{formControl.title}</CButton>
+                            <CButton className="custom-button" color="primary" type="submit">{formControl.title}</CButton>
+                        </CCol>
+                    </CForm>
+                </CModalBody>
+            </CModal>
+
+            <CModal
+                scrollable
+                visible={formLinkStop.open}
+                onClose={() => {
+                    setFormLinkStop(defaultForm)
+                    setStopInALine([])
+                }}
+                aria-labelledby="ScrollingLongContentExampleLabel2"
+                backdrop="static"
+            >
+                <CModalHeader>
+                    <CModalTitle id="ScrollingLongContentExampleLabel2">Link Stop</CModalTitle>
+                </CModalHeader>
+                <CModalBody onSubmit={onSubmitLinkStop}>
+                    <CForm className="row g-3">
+
+                        {
+                            stopInALine.map(((stop) => {
+
+                                // const stopFind = stopInALine.find(el => el.stop.id == stop.id)
+
+                                return (
+                                    <div key={stop.id}>
+                                        <CRow className="">
+                                            <CFormLabel className="col-sm-6 col-form-label">{stop.stop.stopName}</CFormLabel>
+                                            {/* <CCol >
+                                                <CFormInput type="text" name={`${stop.id}`} defaultValue={stopFind?.order} />
+                                            </CCol> */}
+                                        </CRow>
+                                    </div>
+                                )
+                            }))
+                        }
+
+                        <CFormInput type="text" />
+
+                        <CCol xs={12}>
+                            {
+                                stops.map(((stop) => {
+                                    const stopFind = stopInALine.find(el => el.stop.id == stop.id)
+                                    return (
+                                        <div key={stop.id} className="d-flex" >
+                                            <CFormLabel className="col-form-label" style={{ flexGrow: 1 }}>{stop.stopName}</CFormLabel>
+                                            <Switch
+                                                checked={stopFind}
+                                                checkedChildren=""
+                                                unCheckedChildren=""
+                                                onClick={() => {
+                                                    handleClickLinkMode(stop)
+                                                }}
+                                            />
+                                        </div>
+                                    )
+                                }))
+                            }
+                        </CCol>
+                        <CCol xs={12}>
+                            <CButton className="custom-button" color="primary" type="submit">{formControl.title}</CButton>
                         </CCol>
                     </CForm>
                 </CModalBody>
             </CModal>
 
             <div style={{ marginBottom: 12 }}>
-                <CButton color="primary" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Add</CButton>
+                <CButton className="custom-button" color="primary" onClick={() => setFormControl({ open: true, title: 'Add', data: null })}>Add</CButton>
             </div>
 
             <CTable hover>
                 <CTableHead>
                     <CTableRow>
                         <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                        <CTableHeaderCell scope="col">Id</CTableHeaderCell>
+                        {/* <CTableHeaderCell scope="col">Id</CTableHeaderCell> */}
                         <CTableHeaderCell scope="col">Name</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Transport Mode</CTableHeaderCell>
                         <CTableHeaderCell scope="col">Action</CTableHeaderCell>
@@ -179,7 +338,7 @@ const Line = () => {
                         .map((item, i) => (
                             <CTableRow key={i}>
                                 <CTableHeaderCell scope="row">{i + 1}</CTableHeaderCell>
-                                <CTableDataCell>{item.id}</CTableDataCell>
+                                {/* <CTableDataCell>{item.id}</CTableDataCell> */}
                                 <CTableDataCell>{item.lineName}</CTableDataCell>
                                 <CTableDataCell>
                                     {item.transportMode.modeName}
@@ -192,10 +351,15 @@ const Line = () => {
                                         style={customTooltipStyle}
                                     >
                                         <CIcon icon={icon.cilLink} size="xl" style={{ cursor: "pointer", color: "#1b9e3e" }}
-                                            onClick={() => linkToRoute(item.id)} />
+                                            onClick={() => linkToRoute(item)} />
                                     </CTooltip>
 
-                                    <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }} />
+                                    <CIcon icon={icon.cilBrush} size='xl' style={{ cursor: "pointer", color: "#1b9e3e" }}
+                                        onClick={() => {
+                                            getStopInALine(item)
+                                            setFormLinkStop({ open: true, title: "Update", data: item })
+                                        }}
+                                    />
 
                                     <CIcon icon={icon.cilXCircle} size='xl' style={{ cursor: "pointer", color: "#e55353" }} />
                                 </CTableDataCell>

@@ -383,6 +383,12 @@ const _nav = [
         to: '/admindashboard',
         icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
     },
+    {
+        component: CNavItem,
+        name: 'Device Manage',
+        to: '/devicemanage',
+        icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
+    },
 ]
 
 export default _nav
