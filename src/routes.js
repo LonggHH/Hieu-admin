@@ -122,6 +122,7 @@ const routes = [
   { path: '/product', name: 'Product', element: Product },
   { path: '/configglobal', name: 'Config Global', element: ConfigGlobal },
   { path: '/devicemanage', name: 'Device Manage', element: DeviceManage },
+  { path: '/admindashboard', name: 'Admin Dashboard', element: AdminDashboard },
 ]
 
 export default routes

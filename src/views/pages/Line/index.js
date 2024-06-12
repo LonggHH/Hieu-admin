@@ -175,7 +175,6 @@ const Line = () => {
             order: stopInALine.length + 1
         }]
 
-        console.log(data);
 
         try {
             const result = await axios.post(`${process.env.URL_BACKEND}/api/v1/location/line_stops`, JSON.stringify(data), {
@@ -183,7 +182,6 @@ const Line = () => {
                     'Content-Type': 'application/json'
                 }
             })
-            console.log(result);
             if (result.data.status === 200) {
                 setFormLinkStop(defaultForm)
                 setStopInALine([])
@@ -193,14 +191,13 @@ const Line = () => {
             }
         } catch (error) {
             console.log("error  ", error);
-            handleShowAlert({ open: true, message: "Error handleClickLinkMode", color: "danger" })
+            handleShowAlert({ open: true, message: "Error .", color: "danger" })
         }
     }
 
     const getStopInALine = async (line) => {
         try {
             const result = await axios.get(`${process.env.URL_BACKEND}/api/v1/location/line_stops/${line.id}`)
-            console.log(result.data.data);
             if (result.data.status === 200) {
                 const data = result.data.data
                 setStopInALine(data)
@@ -210,11 +207,36 @@ const Line = () => {
         }
     }
 
+    const handleChangeOrder = async (stopId, order) => {
+        const data = [{
+            lineId: formLinkStop.data.id,
+            stopId,
+            order: +order
+        }]
+
+        try {
+            const result = await axios.post(`${process.env.URL_BACKEND}/api/v1/location/line_stops`, JSON.stringify(data), {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            if (result.data.status === 200) {
+                setStopInALine([])
+                setFormLinkStop(defaultForm)
+            }
+        } catch (error) {
+            console.log("error  ", error);
+            handleShowAlert({ open: true, message: "Error .", color: "danger" })
+        }
+
+    }
+
     useEffect(() => {
         getTransportModes()
         getLines()
         getStops()
     }, [])
+
 
     return (
         <>
@@ -270,26 +292,19 @@ const Line = () => {
                 </CModalHeader>
                 <CModalBody onSubmit={onSubmitLinkStop}>
                     <CForm className="row g-3">
-
                         {
-                            stopInALine.map(((stop) => {
-
-                                // const stopFind = stopInALine.find(el => el.stop.id == stop.id)
-
-                                return (
-                                    <div key={stop.id}>
-                                        <CRow className="">
-                                            <CFormLabel className="col-sm-6 col-form-label">{stop.stop.stopName}</CFormLabel>
-                                            {/* <CCol >
-                                                <CFormInput type="text" name={`${stop.id}`} defaultValue={stopFind?.order} />
-                                            </CCol> */}
-                                        </CRow>
-                                    </div>
-                                )
-                            }))
+                            stopInALine.map((stop) => (
+                                <CRow className="my-0" key={stop.stop.id}>
+                                    <CFormLabel className="col-sm-10 col-form-label">{stop.stop.stopName}</CFormLabel>
+                                    <CCol sm={2}>
+                                        <CFormInput size="sm" type="number" defaultValue={stop?.order}
+                                            onChange={(e) => handleChangeOrder(stop.stop.id, e.target.value)}
+                                        />
+                                    </CCol>
+                                </CRow>
+                            ))
                         }
-
-                        <CFormInput type="text" />
+                        <hr />
 
                         <CCol xs={12}>
                             {
