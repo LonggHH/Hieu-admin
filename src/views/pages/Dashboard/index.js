@@ -213,12 +213,16 @@ const Dashboard = () => {
     const dataChartProduct = statisticsByMonth(currentYear, productAnalytics, "buyAt");
 
     const dataChartInCome = totalAmountByMonth(currentYear, incomeAnalytics, "transactionDate");
+
     let totalAmount = incomeAnalytics.reduce((total, item) => total += item.amount, 0)
-    const amountUpper = roundToNearestThousand(totalAmount);
+
+
+
+    // const amountUpper = roundToNearestThousand(totalAmount);
+    const amountUpper = totalAmount;
 
     const cartLength = JSON.parse(localStorage.getItem("cartLength"))
 
-    console.log(validationAnalytics);
 
     return (
         <>

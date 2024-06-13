@@ -103,6 +103,8 @@ const Enquire = () => {
                 const { inspections, validations } = result.data.data;
                 const cartTime = [].concat(inspections, validations);
 
+
+
                 let newCartTime = []
                 for (let i = 0; i < cartTime.length; i++) {
                     if (cartTime[i].type == "VALIDATION") {
@@ -113,9 +115,14 @@ const Enquire = () => {
                         newCartTime.push(cartTime[i])
                     }
                 }
+
+
+
                 newCartTime.sort((a, b) => new Date(b.transactionTimeStart) - new Date(a.transactionTimeStart));
-                newCartTime = newCartTime.filter(el => el.transactionTimeEnd == el.transactionTimeStart)
-                console.log(newCartTime);
+                // console.log(newCartTime);
+                // newCartTime = newCartTime.filter(el => el.transactionTimeEnd == el.transactionTimeStart)
+
+
                 setEnquire(result.data.data);
                 setTimeLine(newCartTime);
                 setTotalPage(Math.ceil(newCartTime.length / pageSize));
@@ -246,7 +253,7 @@ const Enquire = () => {
         getProductForLinkCard()
     }, [])
 
-    // console.log(enquire);
+    // console.log(timeLine);
 
     return (
         <>
