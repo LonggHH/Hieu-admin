@@ -103,28 +103,29 @@ const Enquire = () => {
                 const { inspections, validations } = result.data.data;
                 const cartTime = [].concat(inspections, validations);
 
-
-
                 let newCartTime = []
                 for (let i = 0; i < cartTime.length; i++) {
                     if (cartTime[i].type == "VALIDATION") {
+                        const { transactionTimeStart, transactionTimeEnd } = cartTime[i]
                         const { stopEnd, stopStart, ...data } = cartTime[i]
-                        newCartTime.push({ stopStart, ...data })
-                        newCartTime.push({ stopEnd, ...data })
+
+                        if (transactionTimeEnd == transactionTimeStart || transactionTimeEnd == null) {
+                            newCartTime.push({ stopStart, ...data })
+                        } else {
+                            newCartTime.push({ stopStart, ...data })
+                            newCartTime.push({ stopEnd, ...data })
+                        }
                     } else {
                         newCartTime.push(cartTime[i])
                     }
                 }
 
-
-
                 newCartTime.sort((a, b) => new Date(b.transactionTimeStart) - new Date(a.transactionTimeStart));
                 // console.log(newCartTime);
                 // newCartTime = newCartTime.filter(el => el.transactionTimeEnd == el.transactionTimeStart)
 
-
-                setEnquire(result.data.data);
                 setTimeLine(newCartTime);
+                setEnquire(result.data.data);
                 setTotalPage(Math.ceil(newCartTime.length / pageSize));
             }
         } catch (error) {
@@ -431,12 +432,13 @@ const Enquire = () => {
                                             .map((item, i) => (
                                                 <CTableRow>
                                                     <CTableHeaderCell>
-                                                        {
+                                                        {/* {
                                                             item.type == "INSPECTION" ?
                                                                 moment(item.transactionTimeStart).format('HH:mm:ss DD/MM/YYYY')
                                                                 : item?.stopStart ? moment(item.transactionTimeStart).format('HH:mm:ss DD/MM/YYYY')
                                                                     : moment(item.transactionTimeEnd).format('HH:mm:ss DD/MM/YYYY')
-                                                        }
+                                                        } */}
+                                                        {moment(item.transactionTimeStart).format('HH:mm:ss DD/MM/YYYY')}
                                                     </CTableHeaderCell>
                                                     {/* <CTableDataCell>{item.id}</CTableDataCell> */}
                                                     <CTableDataCell>{item.type === "INSPECTION" ? "Inspection" : "Tap"}</CTableDataCell>
